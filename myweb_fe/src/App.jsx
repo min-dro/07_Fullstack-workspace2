@@ -7,6 +7,9 @@ import { Routes, Route } from 'react-router-dom';
 
 import Index from "./Index";
 
+import MemberListComponent from "./member/components/MemberListComponent";
+import MemberDetailComponent from "./member/components/MemberDetailComponent";
+
 function App() {
   
   // 실행할 구문
@@ -27,6 +30,9 @@ function App() {
         
         <Routes>
           <Route path="/" element={ <Index /> } />
+          
+          <Route path="/member/list" element={ <MemberListComponent /> } />
+          <Route path="/member/detail/:userId" element={ <MemberDetailComponent /> }/>
         </Routes>
         
       </div>

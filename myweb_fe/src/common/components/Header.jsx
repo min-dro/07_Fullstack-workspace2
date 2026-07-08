@@ -11,7 +11,7 @@ function Header() {
     // return 구문
     return (
         <div>
-            <h1 align="center">Welcome to React Managet</h1>
+            <h1 align="center">Welcome to React Manager</h1>
 
             <br/><br/>
 
@@ -20,10 +20,10 @@ function Header() {
                     <Link to="/">HOME</Link>
                 </div>
                 <div>
-                    <Link to="/members">회원관리</Link>
+                    <Link to="/member/list">회원관리</Link>
                 </div>
                 <div>
-                    <Link to="/boards">공지사항 목록 관리</Link>
+                    <Link to="/boards">공지사항관리</Link>
                 </div>
                 <div>
                     <Link to="/boards">일반게시판관리</Link>
@@ -35,3 +35,13 @@ function Header() {
 
 // 내보내기
 export default Header;
+
+/*
+ * * 브라우저 창에 보이는 URL 주소 VS 백엔드와 통신할 때 쓰이는 URL 주소
+ * - 브라우저 창에 보이는 URL 주소 : 예전에 쓴대로 도메인/기능 이런식으로 명시적으로 작성
+ *                                 시용자 눈에 보이는 주소임
+ *   예) /member/list, /member/detail/x, /member/enrollForm 등
+ * - 백엔드와 통신할 때 쓰이는 URL 주소 : REST API 형식으로 작성
+ *                                      사용자 눈에 안보이는 주소임
+ *   예) /members, /members/x 등
+ */

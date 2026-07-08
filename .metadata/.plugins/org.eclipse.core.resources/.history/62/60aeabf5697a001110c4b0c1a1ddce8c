@@ -1,0 +1,10 @@
+package com.kh.myweb.member.model.service;
+
+/*
+ * * 인터페이스 (Interface)
+ * - 모든 필드가 상수필드이고, 모든 메소드가 "추상메소드" 인 일종의 "추상클래스"
+ * 
+ */
+public interface MemberService {
+
+}
