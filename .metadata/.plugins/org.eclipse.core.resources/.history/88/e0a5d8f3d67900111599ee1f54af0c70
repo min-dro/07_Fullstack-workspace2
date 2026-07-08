@@ -1,0 +1,6 @@
+spring.application.name=MyWeb_BE
+
+server.servlet.context-path=/myweb
+server.port=8006
+
+# 요청 Entry Point 는 http://localhost:8006/myweb
