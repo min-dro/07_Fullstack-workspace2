@@ -10,6 +10,8 @@ import Index from "./Index";
 import MemberListComponent from "./member/components/MemberListComponent";
 import MemberDetailComponent from "./member/components/MemberDetailComponent";
 
+import NoticeListComponent from "./notice/components/NoticeListComponent";
+
 function App() {
   
   // 실행할 구문
@@ -33,6 +35,8 @@ function App() {
           
           <Route path="/member/list" element={ <MemberListComponent /> } />
           <Route path="/member/detail/:userId" element={ <MemberDetailComponent /> }/>
+
+          <Route path="/notice/list" element={ <NoticeListComponent /> } />
         </Routes>
         
       </div>

@@ -49,7 +49,7 @@
 		 WHERE USER_ID = #{userId}
 	</select>
 	
-	<!-- 회원 수정용 쿼리문 -->
+	<!-- 회원 정보 수정용 쿼리문 -->
 	<update id="updateMember" parameterType="member">
 		UPDATE MEMBER
 		   SET USER_NAME = #{userName}
@@ -58,14 +58,17 @@
 		     , AGE = #{age}
 		     , PHONE = #{phone}
 		     , ADDRESS = #{address}
+		     , MODIFY_DATE = SYSDATE
 		 WHERE USER_ID = #{userId}
 	</update>
 	
-	<!-- 회원 삭제용 쿼리문 -->
+	<!-- 회원 탈퇴용 쿼리문 -->
 	<update id="deleteMember" parameterType="string">
 		UPDATE MEMBER
 		   SET STATUS = 'N'
+		   	 , MODIFY_DATE = SYSDATE
 		 WHERE USER_ID = #{userId}
+		   AND STATUS = 'Y'
 	</update>
 	
 </mapper>

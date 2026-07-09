@@ -1,0 +1,26 @@
+package com.kh.myweb.notice.model.vo;
+
+import java.sql.Date;
+
+import org.apache.ibatis.type.Alias;
+
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
+
+@NoArgsConstructor
+@Getter
+@Setter
+@ToString
+@Alias("notice")
+public class Notice {
+
+	private int noticeNo;				//	NOTICE_NO	NUMBER
+	private String noticeTitle;			//	NOTICE_TITLE	VARCHAR2(100 BYTE)
+	private String noticeWriter;		//	NOTICE_WRITER	VARCHAR2(30 BYTE)
+	private String noticeContent;		//	NOTICE_CONTENT	VARCHAR2(200 BYTE)
+	private Date createDate;			//	CREATE_DATE	DATE
+	private String status;				//	STATUS	VARCHAR2(1 BYTE)
+	
+}

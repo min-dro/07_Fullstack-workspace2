@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 
-import axios from "axios";
+import { selectMemberListApi }from "../api/memberApi";
 
 import MemberItemComponent from "./MemberItemComponent";
 
@@ -18,10 +18,7 @@ function MemberListComponent() {
 
             try {
 
-                const response = await axios({
-                    url : "http://localhost:8006/myweb/members",
-                    method : "get"
-                });
+                const response = await selectMemberListApi();
 
                 // console.log(response.data);
 

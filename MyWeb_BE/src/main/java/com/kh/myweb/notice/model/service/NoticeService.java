@@ -1,8 +1,23 @@
 package com.kh.myweb.notice.model.service;
 
-import org.springframework.stereotype.Service;
+import java.util.ArrayList;
 
-@Service
-public class NoticeService {
+import com.kh.myweb.notice.model.vo.Notice;
 
+public interface NoticeService {
+
+	// 공지사항 목록 조회용 서비스
+	ArrayList<Notice> selectNoticeList();
+	
+	// 공지사항 상세 조회용 서비스
+	Notice selectNotice(int noticeNo);
+	
+	// 공지사항 작성용 서비스
+	int insertNotice(Notice n);
+
+	// 공지사항 수정용 서비스
+	int updateNotice(Notice n);
+	
+	// 공지사항 삭제용 서비스
+	int deleteNotice(int noticeNo);
 }

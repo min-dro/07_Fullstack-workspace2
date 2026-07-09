@@ -23,7 +23,7 @@ function Header() {
                     <Link to="/member/list">회원관리</Link>
                 </div>
                 <div>
-                    <Link to="/boards">공지사항관리</Link>
+                    <Link to="/notice/list">공지사항관리</Link>
                 </div>
                 <div>
                     <Link to="/boards">일반게시판관리</Link>

@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.kh.myweb.member.model.service.MemberService;
@@ -61,22 +62,35 @@ public class MemberController {
 							 .body(m);
 	}
 
+	// 회원 정보 수정용 컨트롤러
 	@PutMapping("/members/{userId}")
-	public ResponseEntity<Integer> updateMember(@PathVariable String userId, Member m) {
+	public ResponseEntity<String> updateMember(@PathVariable String userId,
+												@RequestBody Member m) {
 		
+		// System.out.println(userId);
+		// System.out.println(m);
+		
+		// 서비스 호출
 		int result = memberService.updateMember(m);
 		
+		String message = (result > 0) ? "success" : "fail";
+		
 		return ResponseEntity.status(HttpStatus.OK)
-				.body(result);
+							 .body(message);
 	}
 
+	// 회원 탈퇴용 컨트롤러
 	@DeleteMapping("/members/{userId}")
-	public ResponseEntity<Integer> deleteMember(@PathVariable String userId) {
+	public ResponseEntity<String> deleteMember(@PathVariable String userId) {
 		
+		// 서비스 호출
 		int result = memberService.deleteMember(userId);
 		
-		return ResponseEntity.status(HttpStatus.NO_CONTENT)
-							 .body(result);
+		String message = (result > 0) ? "success" : "fail";
+		
+		return ResponseEntity.status(HttpStatus.OK)
+							 .body(message);
+		// > "success" 일 경우는 OK 가 아닌 NO_CONTENT (204) 로 응답해도 된다!!
 	}
 
 }
