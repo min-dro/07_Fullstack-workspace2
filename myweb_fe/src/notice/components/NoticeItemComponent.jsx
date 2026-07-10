@@ -1,11 +1,15 @@
+import { useNavigate } from "react-router-dom";
+
 function NoticeItemComponent(props) {
 
     // 실행할 구문
+    let navigate = useNavigate();
+    
     const item = props.item;
 
     // return 구문
     return (
-        <tr>
+        <tr onClick={ () => { navigate(`/notice/detail/${ item.noticeNo }`); } }>
             <td>{ item.noticeNo }</td>
             <td>{ item.noticeTitle }</td>
             <td>{ item.noticeWriter }</td>

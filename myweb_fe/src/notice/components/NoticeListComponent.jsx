@@ -4,9 +4,14 @@ import { selectNoticeListApi } from "../api/NoticeApi";
 
 import NoticeItemComponent from "./NoticeItemComponent";
 
+import { useNavigate } from "react-router-dom";
+
 function NoticeListComponent() {
 
     // 실행할 구문
+    // 화면 깜빡임 없이 URL 주소를 전환해줄 navigate 함수 셋팅
+    let navigate = useNavigate();
+
     // 조회된 데이터를 tr 요소로 감싼 뒤 차곡차곡 담을 배열 형태의 State 변수 셋팅
     const [dataList, setDataList] = useState([]);
 
@@ -51,7 +56,8 @@ function NoticeListComponent() {
             <br /><br />
 
             <div align="right" style={ {width : "950px"} }>
-                <button className="btn btn-outline-secondary btn-sm">
+                <button className="btn btn-outline-secondary btn-sm"
+                        onClick={ () => { navigate("/notice/enrollForm"); } }>
                     글작성
                 </button>
             </div>

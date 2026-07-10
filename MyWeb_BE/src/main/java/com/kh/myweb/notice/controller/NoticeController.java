@@ -11,11 +11,12 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.kh.myweb.common.template.XssDefencePolicy;
 import com.kh.myweb.notice.model.service.NoticeService;
 import com.kh.myweb.notice.model.vo.Notice;
-
 @CrossOrigin
 @RestController
 public class NoticeController {
@@ -34,37 +35,42 @@ public class NoticeController {
 							 .body(list);
 	}
 	
-	// 공지사항 상세 조회용 컨트롤러
-	@GetMapping("/notices/{noticeNo}")
-	public ResponseEntity<Notice> selectNotice(@PathVariable int noticeNo) {
-		
-		// 서비스 호출
-		Notice n = noticeService.selectNotice(noticeNo);
-		
-		return ResponseEntity.status(HttpStatus.OK)
-							 .body(n);
-	}
-	
 	// 공지사항 작성용 컨트롤러
 	@PostMapping("/notices")
-	public ResponseEntity<String> insertNotice(Notice n) {
+	public ResponseEntity<String> insertNotice(@RequestBody Notice n) {
 		
-		// 서비스 호출
+		// System.out.println(n);
+		
+		// XSS 공격 방지 처리 - 공통 코드 작업 참고
+		n.setNoticeTitle(XssDefencePolicy.defence(n.getNoticeTitle()));
+		n.setNoticeContent(XssDefencePolicy.defence(n.getNoticeContent()));
 		int result = noticeService.insertNotice(n);
-		
 		String message = (result > 0) ? "success" : "fail";
 		
 		return ResponseEntity.status(HttpStatus.OK)
 							 .body(message);
 	}
 	
+	// 공지사항 상세조회용 컨트롤러
+	@GetMapping("/notices/{noticeNo}")
+	public ResponseEntity<Notice> selectNotice(@PathVariable int noticeNo) {
+		
+		Notice n = noticeService.selectNotice(noticeNo);
+		
+		return ResponseEntity.status(HttpStatus.OK)
+							 .body(n);
+	}
+	
 	// 공지사항 수정용 컨트롤러
 	@PutMapping("/notices/{noticeNo}")
-	public ResponseEntity<String> updateNotice(@PathVariable int noticeNo, Notice n) {
+	public ResponseEntity<String> updateNotice(@PathVariable int noticeNo,
+											   @RequestBody Notice n) {
 		
-		// 서비스 호출
+		// System.out.println(noticeNo);
+		// System.out.println(n);
+		n.setNoticeTitle(XssDefencePolicy.defence(n.getNoticeTitle()));
+		n.setNoticeContent(XssDefencePolicy.defence(n.getNoticeContent()));
 		int result = noticeService.updateNotice(n);
-		
 		String message = (result > 0) ? "success" : "fail";
 		
 		return ResponseEntity.status(HttpStatus.OK)

@@ -11,6 +11,9 @@ import MemberListComponent from "./member/components/MemberListComponent";
 import MemberDetailComponent from "./member/components/MemberDetailComponent";
 
 import NoticeListComponent from "./notice/components/NoticeListComponent";
+import NoticeEnrollFormComponent from "./notice/components/NoticeEnrollFormComponent";
+import NoticeDetailComponent from "./notice/components/NoticeDetailComponent";
+import NoticeUpdateFormComponent from "./notice/components/NoticeUpdateFormComponent";
 
 function App() {
   
@@ -37,6 +40,9 @@ function App() {
           <Route path="/member/detail/:userId" element={ <MemberDetailComponent /> }/>
 
           <Route path="/notice/list" element={ <NoticeListComponent /> } />
+          <Route path="/notice/enrollForm" element={ <NoticeEnrollFormComponent /> } />
+          <Route path="/notice/detail/:noticeNo" element={ <NoticeDetailComponent /> } />
+          <Route path="/notice/updateForm" element={ <NoticeUpdateFormComponent /> } />
         </Routes>
         
       </div>
@@ -49,4 +55,4 @@ function App() {
 }
 
 // 내보내기
-export default App
+export default App;
