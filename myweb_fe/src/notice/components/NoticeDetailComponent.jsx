@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 
 import { useNavigate, useParams } from "react-router-dom";
 
-import { selectNoticeApi } from "../api/NoticeApi";
+import { selectNoticeApi, deleteNoticeApi } from "../api/NoticeApi";
 
 function NoticeDetailComponent() {
 
@@ -39,7 +39,7 @@ function NoticeDetailComponent() {
                 } else {
                     // > 조회할 데이터가 없는 경우
                     
-                    alert("이미 삭제되거나 없는  공지사항입니다.");
+                    alert("이미 삭제되거나 없는 공지사항입니다.");
 
                     // 공지사항 목록 페이지로 이동
                     navigate("/notice/list");
@@ -54,6 +54,35 @@ function NoticeDetailComponent() {
         selectNotice();
 
     }, []);
+
+    // 삭제하기 버튼 클릭 시 실행할 이벤트 핸들러 함수
+    const deleteNotice =  async () => {
+
+        try {
+
+            const response = await deleteNoticeApi(noticeNo);
+
+            // console.log(response.data);
+
+            if(response.data == "success") {
+                // > 공지사항 삭제에 성공한 경우
+
+                alert("공지사항 삭제에 성공했습니다.");
+
+                // 공지사항 목록 페이지로 이동
+                navigate("/notice/list");
+
+            } else {
+                // > 공지사항 삭제에 실패한 경우
+
+                alert("공지사항 삭제에 실패했습니다.");
+            }
+
+        } catch(error) {
+
+            console.log("공지사항 삭제용 ajax 통신 실패!" + error);
+        }
+    };
 
     // return 구문
     return (
@@ -100,7 +129,8 @@ function NoticeDetailComponent() {
                     수정하기
                 </button>
                 &nbsp;&nbsp;
-                <button className="btn btn-outline-danger btn-sm">
+                <button className="btn btn-outline-danger btn-sm"
+                        onClick={ deleteNotice }>
                     삭제하기
                 </button>
             </div>

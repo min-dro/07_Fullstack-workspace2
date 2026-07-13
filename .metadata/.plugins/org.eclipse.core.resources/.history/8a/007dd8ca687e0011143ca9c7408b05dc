@@ -1,0 +1,52 @@
+package com.kh.myweb.board.model.dao;
+
+import java.util.ArrayList;
+
+import org.apache.ibatis.session.RowBounds;
+import org.mybatis.spring.SqlSessionTemplate;
+import org.springframework.stereotype.Repository;
+
+import com.kh.myweb.board.model.vo.Board;
+import com.kh.myweb.common.model.vo.PageInfo;
+
+@Repository
+public class BoardDao {
+
+	public int selectListCount(SqlSessionTemplate sqlSession) {
+		
+		return sqlSession.selectOne("boardMapper.selectListCount");
+	}
+
+	public ArrayList<Board> selectBoardList(SqlSessionTemplate sqlSession, PageInfo pi) {
+		
+		// 페이징처리의 원리 : 전체 목록을 최신순으로 정렬 후 구간별로 끊어서 조회해오기
+		// 1. 인라인뷰를 여러 겹 싸서 select 문 구현하기 - 성능 이슈는 없지만 구현 복잡
+		// 2. 마이바티스의 RowBounds 객체 이용하기 - 구현은 쉽지만 성능 이슈가 있음
+		
+		int limit = pi.getBoardLimit();
+		int offset = (pi.getCurrentPage() - 1) * limit;
+		RowBounds rowBounds = new RowBounds(offset, limit);
+		
+		return (ArrayList)sqlSession.selectList("boardMapper.selectBoardList", null, rowBounds);
+	}
+
+	public int selectSearchCount(SqlSessionTemplate sqlSession, String keyword) {
+		
+		return sqlSession.selectOne("boardMapper.selectSearchCount", keyword);
+	}
+
+	public ArrayList<Board> selectSearchList(SqlSessionTemplate sqlSession, PageInfo pi, String keyword) {
+		
+		int limit = pi.getBoardLimit();
+		int offset = (pi.getCurrentPage() - 1) * limit;
+		RowBounds rowBounds = new RowBounds(offset, limit);
+		
+		return (ArrayList)sqlSession.selectList("", keyword, rowBounds);
+	}
+
+	public int insertBoard(SqlSessionTemplate sqlSession, Board b) {
+		
+		return sqlSession.insert("boardMapper.insertBoard", b);
+	}
+
+}

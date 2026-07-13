@@ -1,0 +1,69 @@
+package com.kh.myweb.board.model.service;
+
+import java.util.ArrayList;
+
+import org.mybatis.spring.SqlSessionTemplate;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.kh.myweb.board.model.dao.BoardDao;
+import com.kh.myweb.board.model.vo.Board;
+import com.kh.myweb.common.model.vo.PageInfo;
+
+@Service
+public class BoardServiceImpl implements BoardService {
+
+	@Autowired
+	private BoardDao boardDao;
+	
+	@Autowired
+	private SqlSessionTemplate sqlSession; 
+	
+	@Override
+	public int selectListCount() {
+		
+		return boardDao.selectListCount(sqlSession);
+	}
+
+	@Override
+	public ArrayList<Board> selectBoardList(PageInfo pi) {
+		
+		return boardDao.selectBoardList(sqlSession, pi);
+	}
+
+	@Override
+	public int selectSearchCount(String keyword) {
+		return 0;
+	}
+
+	@Override
+	public ArrayList<Board> selectSearchList(PageInfo pi, String keyowrd) {
+		return null;
+	}
+
+	@Override
+	public int insertBoard(Board b) {
+		return 0;
+	}
+
+	@Override
+	public int increaseCount(int boardNo) {
+		return 0;
+	}
+
+	@Override
+	public Board selectBoard(int boardNo) {
+		return null;
+	}
+
+	@Override
+	public int updateBoard(Board b) {
+		return 0;
+	}
+
+	@Override
+	public int deleteBoard(int boardNo) {
+		return 0;
+	}
+
+}

@@ -1,0 +1,36 @@
+package com.kh.myweb.board.model.service;
+
+import java.util.ArrayList;
+
+import com.kh.myweb.board.model.vo.Board;
+import com.kh.myweb.common.model.vo.PageInfo;
+
+public interface BoardService {
+
+	// 게시글 목록 조회 + 페이징 처리용 서비스
+	// 총 게시글의 갯수를 구하는 서비스
+	int selectListCount();
+	
+	// 실제 게시글 목록을 조회해오는 서비스
+	ArrayList<Board> selectBoardList(PageInfo pi);
+	
+	// 게시글 검색 + 페이징 처리용 서비스
+	// 총 검색된 게시글의 갯수를 구하는 서비스
+	int selectSearchCount(String keyword);
+	
+	// 실제 검색된 게시글의 목록을 조회해오는 서비스
+	ArrayList<Board> selectSearchList(PageInfo pi, String keyowrd);
+	
+	// 게시글 작성용 서비스
+	int insertBoard(Board b);
+	
+	// 게시글 상세조회용 서비스
+	// 조회수 증가용 서비스
+	int increaseCount(int boardNo);
+	
+	// 실제 게시글 하나만 조회해주는 서비스 
+	Board selectBoard(int boardNo);
+	
+	// 실제 게시글 하나만 조회해주는 서비스
+	
+}

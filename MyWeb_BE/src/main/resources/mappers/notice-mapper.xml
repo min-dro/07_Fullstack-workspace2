@@ -65,7 +65,7 @@
 	<update id="deleteNotice" parameterType="_int">
 		UPDATE NOTICE
 		   SET STATUS = 'N'
-		 WHERE NOTICE_ID = #{noticeId}
+		 WHERE NOTICE_NO = #{noticeNo}
 		   AND STATUS = 'Y'
 	</update>
 	

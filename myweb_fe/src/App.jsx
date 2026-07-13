@@ -15,6 +15,8 @@ import NoticeEnrollFormComponent from "./notice/components/NoticeEnrollFormCompo
 import NoticeDetailComponent from "./notice/components/NoticeDetailComponent";
 import NoticeUpdateFormComponent from "./notice/components/NoticeUpdateFormComponent";
 
+import BoardListComponent from "./board/components/BoardListComponent";
+
 function App() {
   
   // 실행할 구문
@@ -43,6 +45,8 @@ function App() {
           <Route path="/notice/enrollForm" element={ <NoticeEnrollFormComponent /> } />
           <Route path="/notice/detail/:noticeNo" element={ <NoticeDetailComponent /> } />
           <Route path="/notice/updateForm" element={ <NoticeUpdateFormComponent /> } />
+
+          <Route path="/board/list" element={ <BoardListComponent /> } />
         </Routes>
         
       </div>

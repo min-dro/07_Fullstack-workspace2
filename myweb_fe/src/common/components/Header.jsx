@@ -26,7 +26,7 @@ function Header() {
                     <Link to="/notice/list">공지사항관리</Link>
                 </div>
                 <div>
-                    <Link to="/boards">일반게시판관리</Link>
+                    <Link to="/board/list">일반게시판관리</Link>
                 </div>
             </div>
         </div>

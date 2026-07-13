@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="boardMapper">
+	
+	<!--
+		Board 테이블로부터 조회된 ResultSet 을
+		자바의 Notice VO 클래스로 가공해주는 ResultMap
+	-->
+	<resultMap id="boardResultSet" type="board">
+		<id column="BOARD_NO" property="boardNo" />
+		<result column="BOARD_TITLE" property="boardTitle" />
+		<result column="BOARD_WRITER" property="boardWriter" />
+		<result column="BOARD_CONTENT" property="boardContent" />
+		<result column="ORIGIN_NAME" property="originName" />
+		<result column="CHANGE_NAME" property="changeName" />
+		<result column="COUNT" property="count" />
+		<result column="CREATE_DATE" property="createDate" />
+		<result column="STATUS" property="STATUS" />
+	</resultMap>
+	
+	<!-- 게시판 총 개수 출력용 쿼리문 -->
+	<select id="selectListCount">
+		SELECT COUNT(*)
+		  FROM BOARD
+		 WHERE STATUS = 'Y'
+	</select>
+	
+	<!-- 게시판 목록 조회용 쿼리문 -->
+	<select id="selectBoardList" resultMap="noticeResultSet">
+		SELECT NOTICE_NO
+			 , NOTICE_TITLE
+			 , NOTICE_WRITER
+			 , CREATE_DATE
+		  FROM NOTICE
+		 WHERE STATUS = 'Y'
+		 ORDER BY NOTICE_NO DESC
+	</select>
+	
+	<!-- 게시판 목록 조회용 쿼리문 -->
+	<select id="selectBoardList" resultMap="noticeResultSet">
+		SELECT NOTICE_NO
+			 , NOTICE_TITLE
+			 , NOTICE_WRITER
+			 , CREATE_DATE
+		  FROM NOTICE
+		 WHERE STATUS = 'Y'
+		 ORDER BY NOTICE_NO DESC
+	</select>
+	
+	<!-- 게시판 목록 조회용 쿼리문 -->
+	<select id="selectBoardList" resultMap="noticeResultSet">
+		SELECT NOTICE_NO
+			 , NOTICE_TITLE
+			 , NOTICE_WRITER
+			 , CREATE_DATE
+		  FROM NOTICE
+		 WHERE STATUS = 'Y'
+		 ORDER BY NOTICE_NO DESC
+	</select>
+	
+	<!-- 게시판 작성용 쿼리문 -->
+	<insert id="insertBoard" parameterType="board">
+		INSERT INTO BOARD(BOARD_NO
+						, BOARD_TITLE
+						, BOARD_WRITER
+						, BOARD_CONTENT)
+				   VALUES(SEQ_BNO.NEXTVAL
+						, #{boardTitle}
+						, #{boardWriter}
+						, #{boardContent})
+	</insert>
+	
+	<!-- 게시판 조회수 증가용 쿼리문 -->
+	<update id="increaseCount" parameterType="_int">
+		UPDATE BOARD
+		   SET COUNT = COUNT + 1
+		 WHERE BOARD_NO = #{boardNo}
+		   AND STATUS = 'Y'
+	</update>
+	
+	<!-- 게시판 상세조회용 쿼리문 -->
+	<select id="selectBoard" parameterType="_int" resultMap="boardResultSet">
+		SELECT BOARD_NO
+			 , BOARD_TITLE
+			 , BOARD_WRITER
+			 , BOARD_CONTENT
+			 , CREATE_DATE
+		  FROM BOARD
+		 WHERE BOARD_NO = #{boardNo}
+		   AND STATUS = 'Y'
+	</select>
+	
+	<!-- 게시판 수정용 쿼리문 -->
+	<update id="updateBoard" parameterType="board">
+		UPDATE BOARD
+		   SET BOARD_TITLE = #{boardTitle}
+		   	 , BOARD_CONTENT = #{boardContent}
+		 WHERE BOARD_NO = #{boardNo}
+		   AND STATUS = 'Y'
+	</update>
+	
+	<!-- 게시판 삭제용 쿼리문 -->
+	<update id="deleteBoard" parameterType="_int">
+		UPDATE BOARD
+		   SET STATUS = 'N'
+		 WHERE BOARD_NO = #{boardNo}
+		   AND STATUS = 'Y'
+	</update>
+	
+</mapper>
