@@ -1,0 +1,111 @@
+package com.kh.myweb.common.interceptor;
+
+import java.awt.RenderingHints.Key;
+import java.nio.charset.StandardCharsets;
+import java.util.Date;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+import org.springframework.web.servlet.HandlerInterceptor;
+
+import com.kh.myweb.member.model.vo.Member;
+
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+
+// 로그인 요청을 제외한 나머지 모든 요청 시 "관리자가 맞냐" 검사해주는 인터셉터
+@Component // 이 클래스를 빈으로 등록하겠다.
+public class AuthInterceptor implements HandlerInterceptor {
+
+	// AuthService 도 의존성 주입으로 객체를 받아내야함
+	@Autowired
+	private AuthService authService;
+	// > Interceptor 에서 DB 까지 다녀와야 한다면 Service 부터 호출해서 시작하면 된다!!
+	
+	// 요청 "전" 에 "관리자가 맞는지" 검증하겠다. (jwt 티켓 검사용 메소드)
+	@Override
+	public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
+		   throws Exception {
+		
+		// System.out.println("잘 호출되나?");
+		
+		// 우선 요청 시 전달했었던 인증 토큰 정보 (jwt 티켓) 를 URL 주소의 Header 영역으로부터 뽑아내기
+		
+		// request.getParameter("키값") : String(밸류값)
+		// request.getParameterValues("키값") : String[](밸류값들)
+		// > 요청 시 전달값들을 request 객체의 parameter 영역으로부터 뽑아내는 구문들
+		
+		// request.getHeader("키값") : String(설정밸류값)
+		// > 요청 시 설정값들을 request 객체의 header 영역으로부터 뽑아내는 구문
+		String authHeader = request.getHeader("Authorization");
+		
+		System.out.println(authHeader);
+		// > 토큰이 전달된 경우 "Bearer xxxxxx.xxxxxxxxx.xxxxx"
+		//   토큰이 전달되지 않을 경우
+		
+		// 우선 앞의 "Bearer " 라는 접두어를 제거
+		if((authHeader != null) &&
+				(!authHeader.equals("")) &&
+				(authHeader.startsWith("Bearer"))) {
+			// > 문자열.startsWith("시작문자열");
+			//   문자열이 해당 시작문자열로 시작할 경우 true 를 반환함 (접두어 검사 시 용이)
+			
+			String jwtTokenString = authHeader.substring(7);
+			
+			// System.out.println(jwtTokenString);
+			// 제대로된 토큰이 전달된 경우 "xxxxxx.xxxxxxxxx.xxxxx"
+			
+			// 이 추출해낸 문자열 형태의 jwt 를 가지고 대조 작업 진행
+			
+			// 1. JWT 발급 시 썼었던 비밀 키를 똑같은 형태의 Key 객체로 만들기
+			Key key = Keys.hmacShaKeyFor(AuthController.SECRET_KEY.getBytes(StandardCharsets.UTF_8));
+			// > 발급 시 암호화했었을 때 썼던 키를 검증 시 복호화할 때에도 똑같이 쓴다!!
+			//   "양방향" 암호화 방식 : 암호화 + 복호화 둘 다 가능한 방식
+			//   그 중에서도 암호화, 복호화 둘 다 가능한 방식
+
+			// 2. 위에서 얻어낸 Key 객체를 통해 jwt 문자열을 풀어줌 (파싱)
+			JwtParser parser = Jwts.parserBuilder()
+							       .setSigningKey(key)
+							       .build();
+			
+			
+			Claims claims=  parser.parseClaimsJws(jwtTokenString).getBody();
+			// > claims 객체에 Payload 에 담겨있던 데이터들이 담겨있음!!
+			
+			// 3. claims 에 담긴 데이터를 검증해보기
+			// > 우선 만료시간 먼저 검사할 것!!
+			if(claims.getExpiration().before(new Date())) {
+				// > claims.getExpiration() : JWT 정보 중에 "만료시간" 을 꺼내주는 메소드
+				// > 만료시간.before(현재시간) : 만료시간이 현재시간보다 이전입니까? - 만료됨
+				//	 !만료시간.before(현재시간) : 만료시간이 현재시간보다 이전이 아닙니까? 즉, 이후입니까? - 유효함
+				
+				// > 이 시점 기준으로 만료기산 기준으로 유효한 토큰임!!
+				// > claims 에 담겨있는 고유한 회원의 아이디값 추출
+				String userId = claims.getSubject();
+				
+				// 아이디가 제대로된 회원의 아이디인지를 검사
+				// > DB 로 부터 회원 아이디로 해당 회원의 정보
+				Member m = authService.loginMember(userId);
+				
+				if((userId != null) &&
+						(m != null) &&
+						(userId.equals(m.getUserId())) &&
+						(m.getRole().equals("ADMIN"))) {
+					
+					
+					
+				}
+					
+					
+					
+				
+			}
+			
+
+		}
+		
+		return false;
+	}
+	
+	
+}

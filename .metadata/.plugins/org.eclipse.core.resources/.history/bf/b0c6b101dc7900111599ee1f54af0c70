@@ -1,6 +1,0 @@
-package com.kh.myweb.notice.controller;
-
-@RestController
-public class NoticeController {
-
-}

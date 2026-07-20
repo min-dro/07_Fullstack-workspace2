@@ -28,7 +28,7 @@ function MemberDetailComponent() {
     useEffect(() => {
 
         selectMember();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+
     }, []);
 
     // 회원 한명의 정보를 조회해올 수 있는 함수

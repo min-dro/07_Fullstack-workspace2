@@ -9,6 +9,7 @@ import org.springframework.security.web.SecurityFilterChain;
 @Configuration
 public class SecurityConfig {
 
+	// BCrypotPasswordEncoder 를 빈으로 등록해주는 메소드
 	@Bean
 	public BCryptPasswordEncoder bCryptPasswordEncoder() {
 		

@@ -45,7 +45,7 @@ public class BoardDao {
 		
 		RowBounds rowBounds = new RowBounds(offset, limit);
 		
-		return (ArrayList)sqlSession.selectList("", keyword, rowBounds);
+		return (ArrayList)sqlSession.selectList("boardMapper.selectSearchList", keyword, rowBounds);
 	}
 
 	public int insertBoard(SqlSessionTemplate sqlSession, Board b) {
@@ -55,12 +55,12 @@ public class BoardDao {
 
 	public int increaseCount(SqlSessionTemplate sqlSession, int boardNo) {
 		
-		return sqlSession.update("boardMapper.increaseCount", sqlSession);
+		return sqlSession.update("boardMapper.increaseCount", boardNo);
 	}
 
 	public Board selectBoard(SqlSessionTemplate sqlSession, int boardNo) {
 		
-		return sqlSession.selectOne("boardMapper.selectBoard", sqlSession);
+		return sqlSession.selectOne("boardMapper.selectBoard", boardNo);
 	}
 
 	public int updateBoard(SqlSessionTemplate sqlSession, Board b) {
@@ -73,4 +73,6 @@ public class BoardDao {
 		return sqlSession.update("boardMapper.deleteBoard", boardNo);
 	}
 
+	
+	
 }

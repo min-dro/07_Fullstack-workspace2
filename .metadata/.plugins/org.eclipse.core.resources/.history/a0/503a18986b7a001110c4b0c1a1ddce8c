@@ -1,9 +1,0 @@
-package com.kh.myweb.member.model.service;
-
-/*
- * - 모든 팀원들이 동일한 MemberService 라는 인터페이스를 상속받아서 구현한다면
- * 
- */
-public class MemberServiceImpl implements MemberService {
-
-}

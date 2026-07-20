@@ -1,12 +1,16 @@
+import { useNavigate } from "react-router-dom";
+
 function BoardItemComponent(props) {
 
     // 실행할 구문
+    let navigate = useNavigate();
+
     // props = {item : {여기}};
     const item = props.item;
 
     // return 구문
     return (
-        <tr>
+        <tr onClick={ () => { navigate(`/board/detail/${ item.boardNo }`); } }>
             <td>{ item.boardNo }</td>
             <td>{ item.boardTitle }</td>
             <td>{ item.boardWriter }</td>

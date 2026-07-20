@@ -1,0 +1,8 @@
+package com.kh.myweb.auth.controller;
+
+import org.springframework.web.bind.annotation.CrossOrigin;
+
+@CrossOrigin
+public class AuthController {
+
+}

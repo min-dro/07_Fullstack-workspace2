@@ -203,3 +203,23 @@ INSERT INTO REPLY
 VALUES (SEQ_RNO.NEXTVAL, '세번째 댓글입니다.', 13, 'admin', '20220102', DEFAULT);
 
 COMMIT;
+
+--------------------------------------------------------------------------------
+
+-- 인증 / 인가 기능 구현을 위해 테이블 구조를 살짝만 변경 (DDL - ALTER)
+-- MEMBER 테이블에 회원의 "권한" 을 나타내는 컬럼 하나만 추가!!
+
+ALTER TABLE MEMBER ADD ROLE VARCHAR2(6) CHECK (ROLE IN ('ADMIN', 'USER'));
+
+-- DEFAULT 설정 없이 컬럼을 추가하면 기본적으로 NULL 이 담겨있음!!
+-- 'admin' 아이디를 가진 회원은 ROLE 을 'ADMIN' 으로 컬럼값 변경,
+-- 그게 아닌 다른회원들은 ROLE 을 'USER' 로 컬럼값 변경하기
+UPDATE MEMBER
+   SET ROLE = 'ADMIN'
+ WHERE USER_ID = 'admin';
+ 
+UPDATE MEMBER
+   SET ROLE = 'USER'
+ WHERE USER_ID != 'admin';
+
+COMMIT;

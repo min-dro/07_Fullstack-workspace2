@@ -1,5 +1,7 @@
 import axios from "axios";
 
+import { getAuthorization } from "../../common/api/commonApi";
+
 // 공통 URL 변수 처리
 const BASE_URL = "http://localhost:8006/myweb/notices"
 
@@ -7,8 +9,11 @@ const BASE_URL = "http://localhost:8006/myweb/notices"
 const selectNoticeListApi = () => {
 
     const response = axios({
-        url : BASE_URL,
-        method : "get"
+        url : `${ BASE_URL }`,
+        method : "get",
+        headers : {
+            Authorization : getAuthorization()
+        }
     });
 
     return response;
@@ -18,9 +23,12 @@ const selectNoticeListApi = () => {
 const insertNoticeApi = notice => {
 
     const response = axios({
-        url : BASE_URL,
+        url : `${ BASE_URL }`,
         method : "post",
-        data : notice
+        data : notice,
+        headers : {
+            Authorization : getAuthorization()
+        }
     });
 
     return response;
@@ -32,6 +40,9 @@ const selectNoticeApi = noticeNo => {
     const response = axios({
         url : `${ BASE_URL }/${ noticeNo }`,
         method : "get",
+        headers : {
+            Authorization : getAuthorization()
+        }
     });
 
     return response;
@@ -43,7 +54,10 @@ const updateNoticeApi = (noticeNo, notice) => {
     const response = axios({
         url : `${ BASE_URL }/${ noticeNo }`,
         method : "put",
-        data : notice
+        data : notice,
+        headers : {
+            Authorization : getAuthorization()
+        }
     });
 
     return response;
@@ -54,7 +68,10 @@ const deleteNoticeApi = noticeNo => {
 
     const response = axios({
         url : `${ BASE_URL }/${ noticeNo }`,
-        method : "delete"
+        method : "delete",
+        headers : {
+            Authorization : getAuthorization()
+        }
     });
 
     return response;

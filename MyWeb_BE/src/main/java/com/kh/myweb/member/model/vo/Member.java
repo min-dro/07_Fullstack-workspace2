@@ -30,4 +30,5 @@ public class Member {
 	private Date modifyDate;		//	MODIFY_DATE	DATE
 	private String status;			//	STATUS	VARCHAR2(1 BYTE)
 	
+	private String role;
 }

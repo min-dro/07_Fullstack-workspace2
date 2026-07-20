@@ -1,0 +1,8 @@
+package com.kh.myweb.config;
+
+import org.springframework.context.annotation.Configuration;
+
+@Configuration // 이 클래스를 환경설정에서 용도로 쓰겠다.
+public class InterceptorConfig {
+
+}

@@ -1,14 +1,17 @@
-import { useEffect, useState } from "react";
+import { useState, useEffect } from "react";
 
-import { useSearchParams } from "react-router-dom";
+import { useSearchParams, useNavigate } from "react-router-dom";
 
-import { selectBoardListApi } from "../api/boardApi";
+import { selectBoardListApi, searchBoardListApi } from "../api/boardApi";
 
 import BoardItemComponent from "./BoardItemComponent";
 
 function BoardListComponent() {
 
     // 실행할 구문
+    // navigate = useNavigate();
+    let navigate = useNavigate();
+
     // 입력된 검색어를 담아둘 State 형 변수 셋팅
     const [keyword, setKeyword] = useState("");
 
@@ -18,6 +21,10 @@ function BoardListComponent() {
     // > searchParams : 현재 URL 의 QueryString 을 담는 객체
     // > setSearchParams : URL 의 QueryString 을 변경하는 함수 (setter 함수)
     // > QueryString 을 조작할 경우에는 Link 컴포넌트와 함께 쓰면 안됨!! (충돌남)
+
+    // > 검색어 또한 쿼리스트링으로 처리해야 페이징 처리까지 완정히 적용된다!!
+    const searchKeyword = searchParams.get("keyword") || "";
+    // > or 연산자에 의해 이 컴포넌트로 최초 진입 시에는 "" 로 초기화 될 것!!
 
     // > cpage 값이 새로고침되는것을 막기 위해 QueryString 을 활용한다!!
     const cpage = parseInt(searchParams.get("cpage")) || 1;
@@ -38,119 +45,170 @@ function BoardListComponent() {
     // 이 컴포넌트 함수가 최초 로딩시 딱 한번만 실행할 구문
     useEffect(() => {
 
-        const selectBoardList = async () => {
+        // cpage가 변경될 때 if 문으로 선택적으로 처리시켜서 페이지 이동 시 검색이 풀리는 이슈 해결
+        if(searchKeyword == "") {
+            // > 입력된 검색어가 없을 경우 - 일반 목록 조회 처리
 
-            try {
+            selectBoardList();
 
-                const response = await selectBoardListApi(cpage);
+        } else {
+            // > 입력된 검색어가 있을 경우 - 검색 목록 조회 처리
 
-                // console.log(response.data);
-                // console.log(response.data.list); // [{}, {}, ...]
-                // console.log(response.data.pi); // {}
+            searchBoardList();
+            // > 매개변수에 대해 인자값을 호출 시 굳이 안넘겨도 됨!! (오류 안남)
+        }
 
-                // 실제 tbody 에 들어갈
-                // 우선 response.data.list 를 별도의 변수를 옮겨담기
-                const items = response.data.list; 
+    }, [cpage, searchKeyword]);
 
-                const trArr = items.map((item, index) => {
-                    
-                    return( 
-                        <BoardItemComponent key={ index } item={ item } />
-                    );
-                });
+    // 일반 게시글 목록 조회 함수
+    const selectBoardList = async () => {
 
-                setDataList(trArr);
+        try {
 
-                // paging-area 에 들어갈 데이터 후처리
-                // 우선 response.data.pi 를 별도의 변수로 옮겨담기
-                const pageInfo = response.data.pi;
+            const response = await selectBoardListApi(cpage);
 
-                // console.log(pageInfo);
-                // > pageInfo.startPage ~ pageInfo.endPage 까지 1씩 증가시키면서 페이징바 버튼 생성
-                const btnArr = [];
+            // console.log(response.data);
+            // console.log(response.data.list); // [{}, {}, ...]
+            // console.log(response.data.pi); // {}
+            
+            // 조회해온 데이터들로 후처리 - 공통 코드 작업
+            handleResponse(response);
 
-                if(cpage == 1) {
+        } catch(error) {
 
-                    btnArr.push(
-                        <button key="prev" className="btn btn-info btn-sm">
-                            &lt;
-                        </button>
-                    );
-
-                } else {
-
-                    btnArr.push(
-                        <button key="prev" className="btn btn-outline-info btn-sm"
-                              onClick={ () => {
-                                /* setCpage(cpage - 1); */
-                                setSearchParams({ cpage : cpage - 1 });
-                              } }>
-                            &lt;
-                        </button>
-                    );
-                }
-
-                for(let p = pageInfo.startPage; p <= pageInfo.endPage; p++) {
-
-                    if(cpage == p) {
-                        
-                        btnArr.push(
-                            <button key={ p } className="btn btn-info btn-sm">
-                                { p }
-                            </button>
-                        );
-
-                    } else {
-                      
-                        btnArr.push(
-                            <button key={ p } className="btn btn-outline-info btn-sm"
-                                  onClick={ () => { 
-                                    /* setCpage(p); */
-                                    setSearchParams({ cpage : p })
-                                } }>
-                                { p }
-                            </button>
-                        );
-                    }
-                }
-
-                if(cpage == pageInfo.maxPage) {
-
-                    btnArr.push(
-                        <button key="next" className="btn btn-info btn-sm">
-                           &gt;
-                        </button>
-                    );
-
-                } else {
-
-                    btnArr.push(
-                        <button key="next" className="btn btn-outline-info btn-sm"
-                                onClick={ () => { 
-                                    /* setCpage(cpage + 1); */
-                                    setSearchParams({ cpage : cpage + 1 });
-                                } }>
-                           &gt;
-                        </button>
-                    );
-                }
-
-                setPageList(btnArr);
-
-            } catch(error) {
-
-                console.log("일반게시글 목록 조회용 ajax 통신 실패!" + error);
-            }
-        };
-
-        selectBoardList();
-
-    }, [cpage]);
+            console.log("일반게시글 목록 조회용 ajax 통신 실패!" + error);
+        }
+    };
 
     // 검색어 입력 내용이 변경될 때 마다 실행할 이벤트 핸들러 함수
     const handleChange = e => {
 
         setKeyword(e.target.value);
+    };
+
+    // 검색 버튼 클릭 시 (검색 최초 진입) 실행할 이벤트 핸들러 함수는 따로 분리
+    const handleClick = e => {
+
+        e.preventDefault();
+        // > 기본 이벤트 제거
+
+        setSearchParams({ cpage : 1, keyword : keyword });
+        // > 브라우저에 보이는 쿼리스트링 변경
+        //   (최초 진입이기 때문에 cpage 는 1로 고정)
+        // > setSearchParams 함수가 호출됨으로써 searchParams 객체가 변경되었음!!
+        //   searchParams 내부의 keyword 도 같이 변경됨!! (searchKeyword 변수값도 바뀜)
+    };
+
+    // 검색 요청용 함수
+    const searchBoardList = async () => {
+
+        try {
+
+            const response = await searchBoardListApi(cpage, searchKeyword);
+
+            // console.log(response.data);
+
+            // 조회해온 데이터들로 후처리 - 공통 코드 작업
+            handleResponse(response);
+
+        } catch(error) {
+
+            console.log("일반게시글 검색용 ajax 통신 실패!" + error);
+        }
+    };
+
+    // list, pi 값을 각각 출력해주는 후처리 공통 함수
+    const handleResponse = response => {
+
+        // 실제 tbody 에 들어갈 목록데이터 처리
+        // 우선 response.data.list 를 별도의 변수로 옮겨담기
+        const items = response.data.list;
+
+        const trArr = items.map((item, index) => {
+
+            return (
+                <BoardItemComponent key={ index } item={ item } />
+            );
+        });
+
+        setDataList(trArr);
+
+        // paging-area 에 들어갈 데이터 후처리
+        // 우선 response.data.pi 를 별도의 변수로 옮겨담기
+        const pageInfo = response.data.pi;
+
+        // console.log(pageInfo);
+        // > pageInfo.startPage ~ pageInfo.endPage 까지 1씩 증가시키면서 페이징바 버튼 생성
+        const btnArr = [];
+
+        if(cpage == 1) {
+
+            btnArr.push(
+                <button key="prev" className="btn btn-info btn-sm">
+                    &lt;
+                </button>
+            );
+
+        } else {
+
+            btnArr.push(
+                <button key="prev" className="btn btn-outline-info btn-sm"
+                        onClick={ () => {
+                            /* setCpage(cpage - 1); */
+                            setSearchParams({ cpage : cpage - 1, keyword : searchKeyword });
+                        } }>
+                    &lt;
+                </button>
+            );
+        }
+
+        for(let p = pageInfo.startPage; p <= pageInfo.endPage; p++) {
+
+            if(cpage == p) {
+
+                btnArr.push(
+                    <button key={ p } className="btn btn-info btn-sm">
+                        { p }
+                    </button>
+                );
+
+            } else {
+
+                btnArr.push(
+                    <button key={ p } className="btn btn-outline-info btn-sm"
+                            onClick={ () => {
+                                /* setCpage(p); */
+                                setSearchParams({ cpage : p, keyword : searchKeyword });
+                            } }>
+                        { p }
+                    </button>
+                );
+            }
+        }
+
+        if(cpage == pageInfo.maxPage) {
+            
+            btnArr.push(
+                <button key="next" className="btn btn-info btn-sm">
+                    &gt;
+                </button>
+            );
+
+        } else {
+
+            btnArr.push(
+                <button key="next" className="btn btn-outline-info btn-sm"
+                        onClick={ () => {
+                            /* setCpage(cpage + 1); */
+                            setSearchParams({ cpage : cpage + 1, keyword : searchKeyword });
+                        } }>
+                    &gt;
+                </button>
+            );
+        }
+
+        setPageList(btnArr);
+
     };
 
     // return 구문
@@ -165,14 +223,16 @@ function BoardListComponent() {
                 <form>
                     <input type="text" name="keyword" placeholder="제목을 입력하세요" 
                            value={ keyword } onChange={ handleChange } />
-                    <button type="submit">검색</button>
+                    <button type="submit"
+                            onClick={ handleClick }>검색</button>
                 </form>
             </div>
 
             <br /><br />
 
             <div align="right" style={ {width : "950px"} }>
-                <button className="btn btn-outline-secondary btn-sm">
+                <button className="btn btn-outline-secondary btn-sm"
+                        onClick={ () => { navigate("/board/enrollForm"); } }>
                     글작성
                 </button>
             </div>

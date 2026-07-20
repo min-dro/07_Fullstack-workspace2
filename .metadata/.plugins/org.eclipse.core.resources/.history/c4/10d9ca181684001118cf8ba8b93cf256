@@ -1,0 +1,5 @@
+package com.kh.myweb.auth.model.service;
+
+public class AuthService {
+
+}

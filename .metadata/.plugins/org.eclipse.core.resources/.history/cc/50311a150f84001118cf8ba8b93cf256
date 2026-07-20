@@ -1,0 +1,5 @@
+package com.kh.myweb.auth.controller;
+
+public class AuthController {
+
+}
