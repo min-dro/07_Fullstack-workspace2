@@ -65,10 +65,17 @@ public class MemberController {
 	// 회원 정보 수정용 컨트롤러
 	@PutMapping("/members/{userId}")
 	public ResponseEntity<String> updateMember(@PathVariable String userId,
-												@RequestBody Member m) {
+											   @RequestBody Member m) {
 		
 		// System.out.println(userId);
 		// System.out.println(m);
+		
+		if(m.getGender().equals("")) {
+			
+			m.setGender(null);
+		}
+		// > MySQL 에서는 "" 이 자동으로 NULL 로 들어가지 않음!! (오라클에서는 됐었음)
+		// > 이 코드를 살려두더라도 오라클레서는 상관 없이 잘 돌아갈 것
 		
 		// 서비스 호출
 		int result = memberService.updateMember(m);

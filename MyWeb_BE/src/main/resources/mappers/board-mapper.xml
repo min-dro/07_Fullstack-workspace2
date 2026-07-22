@@ -42,14 +42,21 @@
 	
 	<!-- 검색된 게시글의 갯수를 구하는 쿼리문 -->
 	<select id="selectSearchCount" parameterType="string" resultType="_int">
+	<!--
 		SELECT COUNT(*)
 		  FROM BOARD
 		 WHERE BOARD_TITLE LIKE '%' || #{keyword} || '%'
+		   AND STATUS = 'Y'
+	-->
+		SELECT COUNT(*)
+		  FROM BOARD
+		 WHERE BOARD_TITLE LIKE CONCAT('%', #{keyword}, '%')
 		   AND STATUS = 'Y'
 	</select>
 	
 	<!-- 일반게시글 검색용 쿼리문 -->
 	<select id="selectSearchList" parameterType="string" resultMap="boardResultSet">
+	<!--
 		SELECT BOARD_NO
 			 , BOARD_TITLE
 			 , BOARD_WRITER
@@ -60,10 +67,22 @@
 		 WHERE STATUS = 'Y'
 		   AND BOARD_TITLE LIKE '%' || #{keyword} || '%'
 		 ORDER BY BOARD_NO DESC
+	-->
+		SELECT BOARD_NO
+			 , BOARD_TITLE
+			 , BOARD_WRITER
+			 , COUNT
+			 , CREATE_DATE
+			 , ORIGIN_NAME
+		  FROM BOARD
+		 WHERE STATUS = 'Y'
+		   AND BOARD_TITLE LIKE CONCAT('%', #{keyword}, '%')
+		 ORDER BY BOARD_NO DESC
 	</select>
 	
 	<!-- 게시글 작성용 쿼리문 -->
 	<insert id="insertBoard" parameterType="board">
+	<!--
 		INSERT INTO BOARD(BOARD_NO
 						, BOARD_TITLE
 						, BOARD_WRITER
@@ -76,6 +95,17 @@
 						, #{boardContent}
 						, #{originName}
 						, #{changeName})
+	-->
+		INSERT INTO BOARD(BOARD_TITLE
+						, BOARD_WRITER
+						, BOARD_CONTENT
+						, ORIGIN_NAME
+						, CHANGE_NAME)
+				   VALUES(#{boardTitle}
+				   		, #{boardWriter}
+				   		, #{boardContent}
+				   		, #{originName}
+				   		, #{changeName})
 	</insert>
 	
 	<!-- 조회수 증가용 쿼리문 -->
