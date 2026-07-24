@@ -46,8 +46,8 @@ public class MemberController {
 		
 		// insert 할 회원의 정보를 요청 시 전달값으로 받았다는 가정 하에
 		Member m = new Member();
-		m.setUserId("user04");
-		m.setUserPwd("pass044");
+		m.setUserId("user01");
+		m.setUserPwd("pass01");
 		m.setUserName("강개똥");
 		m.setGender("F");
 		m.setAge(42);

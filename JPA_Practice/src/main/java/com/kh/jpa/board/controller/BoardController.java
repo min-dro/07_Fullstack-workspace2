@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.kh.jpa.board.model.service.BoardService;
 import com.kh.jpa.board.model.vo.Board;
+import com.kh.jpa.board.model.vo.Reply;
 import com.kh.jpa.member.model.service.MemberService;
 import com.kh.jpa.member.model.vo.Member;
 
@@ -47,11 +48,11 @@ public class BoardController {
 		
 		// 요청 시 전달값으로 등록할 게시글 정보를 받아왔다 라는 가정 하에
 		Board b = new Board();
-		b.setBoardTitle("세번째 게시글의 제목입니다");
-		b.setBoardContent("세번째 게시글의 내용입니다.");
+		b.setBoardTitle("2번 게시글의 제목입니다");
+		b.setBoardContent("2번 게시글의 내용입니다.");
 		
 		// 작성자의 Member 객체를 얻어내려면
-		Member m = memberService.selectMember("user04");
+		Member m = memberService.selectMember("user01");
 		
 		b.setMember(m); // Member 객체를 통으로 셋팅
 		
@@ -95,7 +96,7 @@ public class BoardController {
 		boardService.deleteBoard(boardNo);
 		
 		// 삭제가 제대로 되었는지 검사
-		boolean result = boardService.existsBoard(boardNo);
+		boolean result = boardService.existsById(boardNo);
 		
 		if(!result) {
 			
@@ -143,6 +144,84 @@ public class BoardController {
 		long listCount = boardService.selectListCount();
 		
 		System.out.println(listCount);
+	}
+
+	// -----------------------------------------------------------
+	
+	// 9) 댓글 추가용 컨트롤러
+	// 요청 URL : /jpa/board/rinsert
+	@GetMapping("rinsert")
+	public void insertReply() {
+		
+		// 요청 시 전달값을 받았다라는 가정 하에
+		Reply r = new Reply();
+		
+		r.setReplyContent("3번 댓글 내용입니다.");
+		
+		// 기존 게시글 정보 하나를 불러오기
+		Board b = boardService.selectBoard(1);
+		
+		r.setBoard(b);
+		
+		// 기존 회원 정보 하나를 불러오기
+		Member m = memberService.selectMember("user01");
+		
+		r.setMember(m);
+		
+		Reply insertR = boardService.insertReply(r);
+		
+		System.out.println(insertR);
+		
+	}
+	
+	// 10) 댓글 목록 조회용 컨트롤러
+	// 요청 URL : /jpa/board/rlist
+	@GetMapping("rlist")
+	public void selectReplyList() {
+		
+		// 특정 게시글에 딸린 댓글들의 목록 조회
+		List<Reply> list = boardService.selectReplyList(1);
+		
+		for(Reply r : list) {
+			
+			System.out.println(r);
+		}
+	}
+	// > Board 테이블에 List<Reply> 타입의 @OneToMany 필드가 없어도 충분히
+	//   자식데이터들에 대한 목록 조회가 가능하다!! (오히려 이게 권장사항임)
+
+	// 11) 댓글 삭제용 컨트롤러
+	// 요청 URL : /jpa/board/rdelete
+	@GetMapping("rdelete")
+	public void deleteReply() {
+		
+		// 삭제할 댓글의 번호를 받아왔다라는 가정 하에
+		int result = boardService.deleteReply(4);
+		
+		// result > 0 : 성공 처리
+	}
+	
+	// 12) 특정 게시글의 활성 댓글 갯수 조회
+	// 요청 URL : /jpa/board/rcount/x
+	@GetMapping("rcount/{boardNo}")
+	public void selectReplyCount(@PathVariable int boardNo) {
+		
+		long replyCount = boardService.selectReplyCount(boardNo);
+		
+		System.out.println("댓글 갯수 : " + replyCount);
+	}
+	
+	// 13) 특정 회원이 작성한 댓글들 + 게시글의 제목도 함께 조회
+	// 요청 URL : /jpa/board/reply/{userId}
+	@GetMapping("{userId}/rlist")
+	public void selectReplyByUser(@PathVariable String userId) {
+		
+		List<Reply> list = boardService.selectReplyByUser(userId);
+		
+		for(Reply r : list) {
+			
+			System.out.println(r);
+		}
 	}
 	
 }

@@ -42,7 +42,7 @@ public interface BoardDao extends JpaRepository<Board, Integer>{
 	
 	// 2) 제목 키워드 (LIKE) 검색 (STATUS 가 'Y'인 애들만)
 	// > SELECT * FROM BOARD WHERE BOARD_TITLE LIKE '%?%' AND STATUS = ?
-	List<Board> findByBoardTitleContainingAndStatus(String keyword, String status);
+	List<Board> findByBoardTitleContainingAndStatusOrderByBoardNoDesc(String keyword, String status);
 	// > findByBoardTitleContaining : boardTitle 필드값을 기준으로 포함여부를 검사하겠다.
 	//   And : AND 연산자를 이용해서 조건을 하나 더붙이겠다.
 	//   Status : status 필드값을 기준으로 일치함을 검사하겠다.
@@ -53,7 +53,7 @@ public interface BoardDao extends JpaRepository<Board, Integer>{
 	//   findByBoardWriter 이런식으로 메소드명을 잡아주면 되지만,
 	//	 우리는 @ManyToOne 관계에 의해 작성자를 나타내는 필드를 Member member; 로 변경했었음!!
 	//   이 상황에 맞는 메소드 네이밍 규칙을 적용해야함!!
-	// > SELECT * FROM BOARD WHERE BOARD_WRITER = ? AND ATATUS = ?
+	// > SELECT * FROM BOARD WHERE BOARD_WRITER = ? AND STATUS = ?
 	List<Board> findByMember_UserIdAndStatusOrderByBoardNoDesc(String userId, String status);
 	// > findBy : 조회하겠다. (SELECT 문을 실행하겠다)
 	//	 Member_UserId : Member Entity (VO 클래스) 의 userId 필드

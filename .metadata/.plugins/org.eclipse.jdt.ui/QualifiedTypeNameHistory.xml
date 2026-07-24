@@ -26,4 +26,6 @@
     <fullyQualifiedTypeName name="java.util.List"/>
     <fullyQualifiedTypeName name="com.kh.jpa.member.model.vo.Member"/>
     <fullyQualifiedTypeName name="org.springframework.transaction.annotation.Transactional"/>
+    <fullyQualifiedTypeName name="jakarta.persistence.FetchType"/>
+    <fullyQualifiedTypeName name="lombok.ToString.Exclude"/>
 </qualifiedTypeNameHistroy>

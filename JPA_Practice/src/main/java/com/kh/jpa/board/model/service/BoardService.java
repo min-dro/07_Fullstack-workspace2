@@ -7,7 +7,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.kh.jpa.board.model.dao.BoardDao;
+import com.kh.jpa.board.model.dao.ReplyDao;
 import com.kh.jpa.board.model.vo.Board;
+import com.kh.jpa.board.model.vo.Reply;
 
 @Service
 public class BoardService {
@@ -15,6 +17,9 @@ public class BoardService {
 	@Autowired
 	private BoardDao boardDao;
 
+	@Autowired
+	private ReplyDao replyDao;
+	
 	// 1) 게시글 목록 조회
 	public List<Board> selectBoardList() {
 		
@@ -49,7 +54,7 @@ public class BoardService {
 	}
 
 	// 6) PK 존재 여부 확인
-	public boolean existsBoard(int boardNo) {
+	public boolean existsById(int boardNo) {
 		
 		return boardDao.existsById(boardNo);
 	}
@@ -63,7 +68,7 @@ public class BoardService {
 	// 8) 게시글 제목 키워드 검색
 	public List<Board> searchBoardList(String keyword) {
 		
-		return boardDao.findByBoardTitleContainingAndStatus(keyword, "Y");
+		return boardDao.findByBoardTitleContainingAndStatusOrderByBoardNoDesc(keyword, "Y");
 	}
 
 	// 9) 특정 유저가 작성한 게시글만 보기
@@ -80,6 +85,38 @@ public class BoardService {
 		
 		return boardDao.countByStatus("Y");
 		// > STATUS 가 'Y' 인 갯수만 세고 싶음!!
+	}
+
+	// 11) 댓글 추가
+	@Transactional
+	public Reply insertReply(Reply r) {
+
+		return replyDao.save(r);
+	}
+
+	// 12) 댓글 목록 조회
+	public List<Reply> selectReplyList(int boardNo) {
+		
+		return replyDao.findByBoard_BoardNoAndStatusOrderByReplyNoDesc(boardNo, "Y");
+	}
+
+	// 13) 댓글 삭제
+	@Transactional
+	public int deleteReply(int replyNo) {
+		
+		return replyDao.deleteReply(replyNo);
+	}
+
+	// 14) 특정 게시글의 활성 댓글 갯수 조회
+	public long selectReplyCount(int boardNo) {
+		
+		return replyDao.selectReplyCount(boardNo);
+	}
+
+	// 15) 특정 회원이 작성한 댓글들 + 게시글의 제목도 함께 조회
+	public List<Reply> selectReplyByUser(String userId) {
+		
+		return replyDao.selectReplyByUser(userId);
 	}
 	
 	

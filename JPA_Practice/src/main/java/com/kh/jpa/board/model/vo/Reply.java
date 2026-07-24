@@ -5,10 +5,12 @@ import java.time.LocalDateTime;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.kh.jpa.member.model.vo.Member;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -23,6 +25,7 @@ import lombok.ToString;
 
 @Entity
 @Table(name="REPLY")
+
 @DynamicInsert
 @DynamicUpdate
 
@@ -46,9 +49,15 @@ public class Reply {
 	// private int refBno;
 	
 	// 외래키 적용
-	@ManyToOne
+	@ManyToOne(fetch=FetchType.LAZY) // 기본값이 EAGER 라 직접 LAZY 명시 필요!!
 	// > 이 Reply 를 기준으로 게시글 하나 당 (1) 댓글이 여러개 (N) 일 수 있다.
 	@JoinColumn(name="REF_BNO")
+	@ToString.Exclude
+	// reply 기준으로 toString 이 호출 될 때 board 필드의 toString 이 실행됨
+	// > 이 필드는 toString 으로부터 제외해달라 라는 뜻
+	@JsonIgnore
+	// > 우리는 Board 객체가 통으로 필요한게 아니라 사실 boardNo 필드만 필요한 것
+	// > @ToString.Exclude, @JsonIgnote 는 연산량이 알게 모르게 계속 쌓이는 것을 방지해줌!! (부가적 원인)
 	private Board board;
 	
 	// 단순 문자열로 작성자 아이디 저장 - 외래키가 안걸린다!!
