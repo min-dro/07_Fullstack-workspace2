@@ -13,7 +13,10 @@ function NoticeEnrollFormComponent() {
     // 입력값을 담아둘 State 형 변수 셋팅
     const[notice, setNotice] = useState({noticeTitle : "",
                                          noticeContent : "",
-                                         noticeWriter : "admin"});
+                                         noticeWriter : "",
+                                         status : "Y"});
+    // > JWTY 를 이용해서 인증, 인가 기능을 붙였을 때, 현재 로그인한 사용자의 정보로
+    //   작성자의 정보를 채워 넣어줘야함!!
 
     // 입력값의 변동이 있을 때마다 실행할 이벤트 핸들러 함수 셋팅
     const handleChange = e => {

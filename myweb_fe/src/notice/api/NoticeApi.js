@@ -77,4 +77,4 @@ const deleteNoticeApi = noticeNo => {
     return response;
 };
 
-export { selectNoticeListApi, insertNoticeApi, selectNoticeApi, updateNoticeApi, deleteNoticeApi }
+export { selectNoticeListApi, insertNoticeApi, selectNoticeApi, updateNoticeApi, deleteNoticeApi };

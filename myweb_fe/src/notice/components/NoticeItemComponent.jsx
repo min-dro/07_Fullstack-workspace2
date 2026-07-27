@@ -12,7 +12,7 @@ function NoticeItemComponent(props) {
         <tr onClick={ () => { navigate(`/notice/detail/${ item.noticeNo }`); } }>
             <td>{ item.noticeNo }</td>
             <td>{ item.noticeTitle }</td>
-            <td>{ item.noticeWriter }</td>
+            <td>{ item.member.userId }</td>
             <td>{ item.createDate.substring(0, 10) }</td>
         </tr>
     );

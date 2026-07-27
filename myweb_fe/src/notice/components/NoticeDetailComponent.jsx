@@ -13,7 +13,7 @@ function NoticeDetailComponent() {
     // 조회해온 공지사항 데이터를 담아둘 State 형 변수 셋팅
     const [notice, setNotice] = useState({noticeNo : "",
                                           noticeTitle : "",
-                                          noticeWriter : "",
+                                          member : {userId : ""},
                                           noticeContent : "",
                                           createDate : ""});
 
@@ -101,7 +101,7 @@ function NoticeDetailComponent() {
                     </tr>
                     <tr>
                         <th>작성자</th>
-                        <td>{ notice.noticeWriter }</td>
+                        <td>{ notice.member.userId }</td>
                         <th width="130">작성일</th>
                         <td>{ notice.createDate.substring(0, 10) }</td>
                     </tr>

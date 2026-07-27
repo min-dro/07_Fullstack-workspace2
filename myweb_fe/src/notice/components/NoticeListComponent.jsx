@@ -31,6 +31,12 @@ function NoticeListComponent() {
 
                 const trArr = items.map((item, index) => {
                     
+                    // console.log(item);
+                    // > Notice Entity 에서 boardWriter 필드를 @ManyToOne 으로 변경해서
+                    //   Member 타입의 필드가 되어버림!!
+                    // > 작성자의 아이디를 가지고 오려면 기존에는 item.boardWriter,
+                    //   이제는 item.member.userId 로 접근해서 가져와야한다!!
+
                     return(
                         <NoticeItemComponent key={ index } item={ item } />
                     );

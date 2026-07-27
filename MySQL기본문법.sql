@@ -72,8 +72,10 @@
 -- [ 표현법 ]
 -- USE 스키마명;
 
-USE PRACTICE;
+-- USE PRACTICE;
 -- PRACTICE 라는 DB 스키마를 이용하겠다.
+
+USE FULLSTACK;
 
 -- 테이블을 생성하기 전에 이미 존재하는 이름일 수도 있으니 DROP TABLE 먼저하기!!
 -- [ 표현법 ]
@@ -172,7 +174,7 @@ SELECT *
 
 -- NOTICE 테이블
 CREATE TABLE NOTICE (
-	NOTIC_NO		INT AUTO_INCREMENT PRIMARY KEY					COMMENT '공지사항번호',
+	NOTICE_NO		INT AUTO_INCREMENT PRIMARY KEY					COMMENT '공지사항번호',
     NOTICE_TITLE	VARCHAR(35) NOT NULL							COMMENT '공지사항제목',
     NOTICE_WRITER	VARCHAR(30)										COMMENT '공지사항작성자아이디',
     NOTICE_CONTENT	VARCHAR(200) NOT NULL							COMMENT '공지사항내용',
