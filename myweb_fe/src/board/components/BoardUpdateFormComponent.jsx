@@ -19,8 +19,11 @@ function BoardUpdateFormComponent() {
     const [board, setBoard] = useState({boardNo : "",
                                         boardTitle : "",
                                         boardContent : "",
+                                        member : {userId : ""},
                                         originName : "",
-                                        changeName : ""});
+                                        changeName : "",
+                                        createDate : "",
+                                        status : ""});
 
     useEffect(() => {
 
@@ -44,9 +47,11 @@ function BoardUpdateFormComponent() {
 
                 const response = await selectBoardFormApi(boardNo);
 
-                // console.log(response.data);
+                console.log(response.data);
 
                 setBoard(response.data);
+
+                // console.log(board);
 
             } catch(error) {
 
@@ -94,6 +99,13 @@ function BoardUpdateFormComponent() {
             // 기존에 있던 첨부파일의 정보들도 같이 넘길것 (originName, changeName)
             formData.append("originName", board.originName);
             formData.append("changeName", board.changeName);
+
+            // 기존 정보들을 모두 넘길 것 DynamicUpdate..
+            formData.append("createDate", board.createDate);
+            formData.append("count", board.count);
+            formData.append("status", board.status);
+            formData.append("member.userId", board.member.userId);
+            // > 작성자의 id 만 넘기고 싶으면 "객체명.필드명" 키값
 
             // 새로운 첨부파일 정보도 넘기기
             if(reupfile.files.length == 1) {

@@ -1,15 +1,17 @@
 package com.kh.myweb.board.model.service;
 
-import java.util.ArrayList;
+import java.util.List;
 
-import org.mybatis.spring.SqlSessionTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.kh.myweb.board.model.dao.BoardDao;
+import com.kh.myweb.board.model.dao.ReplyDao;
 import com.kh.myweb.board.model.vo.Board;
-import com.kh.myweb.common.model.vo.PageInfo;
+import com.kh.myweb.board.model.vo.Reply;
 
 @Service
 public class BoardServiceImpl implements BoardService {
@@ -18,64 +20,82 @@ public class BoardServiceImpl implements BoardService {
 	private BoardDao boardDao;
 	
 	@Autowired
-	private SqlSessionTemplate sqlSession; 
-	
+	private ReplyDao replyDao;
+
 	@Override
-	public int selectListCount() {
+	public Page<Board> selectBoardList(Pageable pageable) {
 		
-		return boardDao.selectListCount(sqlSession);
+		return boardDao.findByStatusOrderByBoardNoDesc("Y", pageable);
 	}
 
 	@Override
-	public ArrayList<Board> selectBoardList(PageInfo pi) {
+	public Page<Board> selectSearchList(String keyword, Pageable pageable) {
 		
-		return boardDao.selectBoardList(sqlSession, pi);
-	}
-
-	@Override
-	public int selectSearchCount(String keyword) {
-		
-		return boardDao.selectSearchCount(sqlSession, keyword);
-	}
-
-	@Override
-	public ArrayList<Board> selectSearchList(PageInfo pi, String keyword) {
-		
-		return boardDao.selectSearchList(sqlSession, pi, keyword);
+		return boardDao.findByBoardTitleContainingAndStatusOrderByBoardNoDesc(keyword, "Y", pageable);
 	}
 
 	@Transactional
 	@Override
-	public int insertBoard(Board b) {
+	public Board insertBoard(Board b) {
 		
-		return boardDao.insertBoard(sqlSession, b);
+		return boardDao.save(b);
 	}
 
 	@Transactional
 	@Override
 	public int increaseCount(int boardNo) {
 		
-		return boardDao.increaseCount(sqlSession, boardNo);
+		return boardDao.increaseCount(boardNo);
 	}
 
 	@Override
 	public Board selectBoard(int boardNo) {
 		
-		return boardDao.selectBoard(sqlSession, boardNo);
+		return boardDao.findById(boardNo).orElse(null);
+		// > 이미 조회수 증가에서 STATUS 가 'Y' 인 조건을 제시했기 때문에
+		//   그냥 findById 로 조회해와도 된다!!
 	}
 
 	@Transactional
 	@Override
-	public int updateBoard(Board b) {
+	public Board updateBoard(Board b) {
 		
-		return boardDao.updateBoard(sqlSession, b);
+		return boardDao.save(b);
 	}
-	
+
 	@Transactional
 	@Override
 	public int deleteBoard(int boardNo) {
-
-		return boardDao.deleteBoard(sqlSession, boardNo);
+		
+		return boardDao.deleteBoard(boardNo);
 	}
 
+	@Override
+	public List<Reply> selectReplyList(int boardNo) {
+		
+		return replyDao.findByBoard_BoardNoAndStatusOrderByReplyNoDesc(boardNo, "Y");
+	}
+
+	@Transactional
+	@Override
+	public Reply insertReply(Reply r) {
+		
+		return replyDao.save(r);
+	}
+
+	@Transactional
+	@Override
+	public Reply updateReply(Reply r) {
+		
+		return replyDao.save(r);
+	}
+
+	@Transactional
+	@Override
+	public int deleteReply(int replyNo) {
+		
+		return replyDao.deleteReply(replyNo);
+	}
+	
+	
 }

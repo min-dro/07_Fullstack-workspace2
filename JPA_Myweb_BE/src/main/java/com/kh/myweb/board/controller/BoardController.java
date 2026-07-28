@@ -2,14 +2,19 @@ package com.kh.myweb.board.controller;
 
 import java.io.IOException;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.ArrayList;
+import java.security.Key;
 import java.util.HashMap;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,12 +27,19 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.kh.myweb.auth.controller.AuthController;
 import com.kh.myweb.board.model.service.BoardService;
 import com.kh.myweb.board.model.vo.Board;
 import com.kh.myweb.common.model.vo.PageInfo;
 import com.kh.myweb.common.template.FileRenamePolicy;
 import com.kh.myweb.common.template.Pagination;
+import com.kh.myweb.member.model.service.MemberService;
+import com.kh.myweb.member.model.vo.Member;
 
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.security.Keys;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 
 @CrossOrigin
@@ -37,75 +49,103 @@ public class BoardController {
 	@Autowired
 	private BoardService boardService;
 	
+	@Autowired
+	private MemberService memberService;
+	
 	// 일반게시글 목록 조회용 컨트롤러
 	@GetMapping("/boards")
 	public ResponseEntity<HashMap<String, Object>> selectBoardList(
 				@RequestParam(value="cpage", defaultValue="1") int currentPage) {
 		
-		// System.out.println(currentPage);
-		
-		// 페이징 처리를 위한 7개의 변수 셋팅
-		// listCount : 총 게시글 갯수 (실제 DB 에서 COUNT 로 세오기)
-		// currentPage : 현재 요청한 페이지 (이미 요청 시 전달값으로 받음)
-		// pageLimit : 한 페이지당 보여질 페이징 바의 페이지 수
-		// boardLimit : 한 페이지당 보여질 게시글의 갯수
-		
-		// maxPage : 마지막 페이지수 (총 몇개의 페이지가 나오는지)
-		// startPage : 하단에 보여질 페이징바의 시작수
-		// endPage : 하단에 보여질 페이징바의 끝수
-		
-		int listCount = boardService.selectListCount();
-		
-		int pageLimit = 5;
-		int boardLimit = 5;
-		
-		PageInfo pi =  Pagination.getPageInfo(listCount, currentPage,
-											  pageLimit, boardLimit);
-		
-		// 서비스 호출
-		ArrayList<Board> list = boardService.selectBoardList(pi);
-		
 		/*
-		System.out.println(pi);
+		 * * JPA 에서의 페이징처리
+		 * 
+		 * - 기존 MyBatis 에서는 페이징 처리를 위해 아래의 과정을 직접 구현했었음
+		 * 1) 총 게시글 수 조회 쿼리를 따로 작성 (listCoint)
+		 * 2) PageInfo 객체에 7개의 변수를 직접 계산해서 셋팅
+		 * 3) Pagination 을 통해 최대한 공통코드 작업을 해서 계산과정을 줄임
+		 * 4) 인라인뷰를 여러겹 쓰거나 또는 MyBatis 의 RowBounds 객체를 통해 페이지 구간별로 잘라서 조회
+		 * 
+		 * - JPA 에서도 페이징 처리를 위한 객체들 (Pageable, Page<Entity타입>) 을 제공해준다!!
+		 * 1) Pageable : 몇 페이지의 몇 개를 조회할지 정보를 담는 객체
+		 * 	  [ 표현법 ]
+		 * 	  Pageable pageable = PageRequest.of(페이지번호, 한체이지당조회할갯수);
+		 * 	  > 단, 페이지번호는 0부터 시작한다!! (즉, 1번페이지가 == 0)
+		 *    > MyBatis 의 RowBounds 와 비슷한 개념임 (앞에서부터 몇 개를 건너뛰고 몇 개를 조회할지)
+		 * 
+		 * 2) Page<Entity> : 조회 결과 + 페이징 정보가 함께 담겨있는 객체
+		 * 	  > List<Entity> 와 비슷, Page 객체에서 제공하는 다양한 메소드들을 통해 페이징 정보를 알아낼 수 있음
+		 * 
+		 * 	  [ 표현법 ]
+		 * 	  Page<Entity> page 가 있다고 치면
+		 *	  page.getContent() : 조회된 데이터 목록 (List<Entity>)
+		 *	  page.getTotalElements() : 총 게시글의 갯수 (listCount값 : COUNT 쿼리를 자동 실행)
+		 *	  page.getTotalPages() : 총 페이지 수 (maxPage)
+		 *	  page.getNumber() : 현재 페이지 번호 (0부터 시작, currentPage - 1)
+		 * 	  page.getSize() : 한 페이지 당 갯수 (boardLimit)
+		 * 
+		 * - Pageable 과 Page<Entity> 의 내부 동작 원리 
+		 *   : 아예 처음부터 쿼리문을 통해 몇본 페이지의 몇 개를 조회해오는 개념임!!
+		 *     DB 로 부터 처음부터 필요한 데이터만 뽑아옴!!
+		 *     
+		 * - 기존 MyBatis 의 RowBounds 객체의 동작 원리
+		 * 	 : 일단 모든 것들을 다 조회 후 내부적으로 (자바 코드를 통해) 필요한 구간의 데이터만 끊어냄!!
+		 *     성능 상 쓰지 않는 것이 권장사항!!
+		 */
 		
-		for(Board b : list) {
-			
-			System.out.println(b);
-		}
-		*/
+		// 사용자가 요청한 currentPage 는 매개변수로 받아온 상태!!
+		// + boardLimit(한 페이지당 몇개씩 보여질건지), pageLimit(페이징바 숫자 갯수) 만 마저 셋팅
+		int boardLimit = 5;
+		int pageLimit = 5;
 		
-		// pi 와 list 를 둘 다 응답데이터로 넘길 것
-		// > pi 와 list 를 하나로 묶어서 넘길 것 (HashMap 으로  -> JSONObject 형식)
+		// > 위의 값들을 가지고 Pageable 객체를 먼저 셋팅
+		Pageable pageable = PageRequest.of(currentPage - 1, 5);
+		
+		// > 위에서 셋팅한 Pageable 객체를 넘기면서 실제 목록을 조회해오기 (구간별로)
+		//   이 때, 조회된 결과는 Page 객체로 넘어온다.
+		Page<Board> page = boardService.selectBoardList(pageable);
+		
+		// > Page 객체로부터 조회된 리스트, 총 게시글의 갯수 구해보기
+		List<Board> list = page.getContent();
+		
+		long listCount = page.getTotalElements();
+		// > 내부적으로 COUNT 함수를 실행해서 갯수를 세오는 것!!
+		
+		// > PageInfo 객체 생성하기
+		PageInfo pi = Pagination.getPageInfo((int)listCount, currentPage,
+													pageLimit, boardLimit);
+		
 		HashMap<String, Object> hm = new HashMap<>();
 		
-		hm.put("pi", pi);
-		hm.put("list", list);
+		hm.put("list", list); // 실제 목록 (tbody) 에 출력 용도
+		hm.put("pi", pi); // 페이징바 만들어낼 용도
 		
 		return ResponseEntity.status(HttpStatus.OK)
 							 .body(hm);
 	}
 	
-	// 일반게시글 검색용 컨트롤라
+	// 일반게시글 검색용 컨트롤러
 	@GetMapping("/boards/search")
 	public ResponseEntity<HashMap<String, Object>> searchBoardList(
 			@RequestParam(value="cpage", defaultValue="1") int currentPage,
 			String keyword) {
 		
-		// System.out.println(currentPage);
-		// System.out.println(keyword);
-		
 		// 검색 목록 조회 또한 페이징 처리가 적용되야 함!!
-		
-		int searchCount = boardService.selectSearchCount(keyword);
 		
 		int pageLimit = 5;
 		int boardLimit = 5;
 		
-		PageInfo pi = Pagination.getPageInfo(searchCount, currentPage,
-												pageLimit, boardLimit);
+		// > Pageable 객체 셋팅
+		Pageable pageable = PageRequest.of(currentPage - 1, boardLimit);
 		
-		// 서비스 호출
-		ArrayList<Board> list = boardService.selectSearchList(pi, keyword);
+		// > Pageable 을 넘기면서 조회헤오기
+		Page<Board> page = boardService.selectSearchList(keyword, pageable);
+		
+		// > 각각의 응답데이터 셋팅하기
+		List<Board> list = page.getContent();
+		long searchCount = page.getTotalElements();
+		
+		PageInfo pi = Pagination.getPageInfo((int)searchCount, currentPage, pageLimit, boardLimit);
 		
 		// pi 와 list 를 HashMap 으로 묶어서 하나의 응답데이터로 넘길 것!!
 		HashMap<String, Object> hm = new HashMap<>();
@@ -119,10 +159,29 @@ public class BoardController {
 	
 	// 일반게시글 작성용 컨트롤러
 	@PostMapping("/boards")
-	public ResponseEntity<String> insertBoard(
-						/* @ModelAttribute */ Board b, MultipartFile upfile,
-										   			   HttpSession session) {
+	public ResponseEntity<String> insertBoard(Board b, MultipartFile upfile,
+										   			   HttpSession session,
+										   			   HttpServletRequest request) {
 	
+		// 작성자 (로그인한 회원) 정보 뽑기
+		String authHeader = request.getHeader("Authorization");
+		String jwtTokenString = authHeader.substring(7);
+		
+		Key key = Keys.hmacShaKeyFor(AuthController.SECRET_KEY
+										.getBytes(StandardCharsets.UTF_8));
+		
+		Claims claims = Jwts.parserBuilder()
+							.setSigningKey(key)
+							.build()
+							.parseClaimsJws(jwtTokenString)
+							.getBody();
+		
+		String userId = claims.getSubject();
+		
+		Member m = memberService.selectMember(userId);
+		
+		b.setMember(m);
+		
 		// System.out.println(b);
 		// > multipart/form-data 형식으로 요청 시에는
 		//   POST 방식으로 요청을 보냈더라도 @RequestBody 어노테이션을 쓰지 않는다!!
@@ -150,10 +209,12 @@ public class BoardController {
 		// 이 시점 기준으로 넘어온 첨부파일이 있다면 b 의 originName, changeName 필드값이 존재
 		// 이 시점 기준으로 넘어온 첨부파일이 없다면 b 의 originName, changeName 필드값은 null
 		
-		// 서비스 호출
-		int result = boardService.insertBoard(b);
+		b.setStatus("Y");
 		
-		String message = (result > 0) ? "success" : "fail";
+		// 서비스 호출
+		Board insertBo = boardService.insertBoard(b);
+		
+		String message = (insertBo != null) ? "success" : "fail";
 		
 		return ResponseEntity.status(HttpStatus.OK)
 							 .body(message);
@@ -253,7 +314,7 @@ public class BoardController {
 		
 		// System.out.println(boardNo);
 		
-		// System.out.println(b);
+		System.out.println(b);
 		// > 기존에 첨부파일이 있다면 originName, changeName 필드값이 !equals("null")
 		
 		// 기존 첨부파일이 없을 경우 "null" --> null
@@ -297,16 +358,16 @@ public class BoardController {
 		// > 위의 경우의 수를 따지지 않고 그냥 무조건 Board 테이블에 update 만 해주면 끝남
 		
 		// 서비스 호출
-		int result = boardService.updateBoard(b);
+		Board updateBo = boardService.updateBoard(b);
 		
-		String message = (result > 0) ? "success" : "fail";
+		String message = (updateBo != null) ? "success" : "fail";
 		
 		return ResponseEntity.status(HttpStatus.OK)
 							 .body(message);
 	}
 	
 	// 일반게시글 삭제용 컨트롤러
-	@DeleteMapping("/boards{boardNo}")
+	@DeleteMapping("/boards/{boardNo}")
 	public ResponseEntity<String> deleteBoard(@PathVariable int boardNo) {
 		
 		// 서비스 호출

@@ -13,7 +13,7 @@ function BoardItemComponent(props) {
         <tr onClick={ () => { navigate(`/board/detail/${ item.boardNo }`); } }>
             <td>{ item.boardNo }</td>
             <td>{ item.boardTitle }</td>
-            <td>{ item.boardWriter }</td>
+            <td>{ item.member.userId }</td>
             <td>{ item.count }</td>
             <td>{ item.createDate.substring(0, 10) }</td>
             <td>{ (item.originName != null) ? "★" : "" }</td>

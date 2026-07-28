@@ -1,78 +1,47 @@
 package com.kh.myweb.board.model.dao;
 
-import java.util.ArrayList;
-
-import org.apache.ibatis.session.RowBounds;
-import org.mybatis.spring.SqlSessionTemplate;
-import org.springframework.stereotype.Repository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
+import org.apache.ibatis.annotations.Param;
 
 import com.kh.myweb.board.model.vo.Board;
-import com.kh.myweb.common.model.vo.PageInfo;
 
-@Repository
-public class BoardDao {
+public interface BoardDao extends JpaRepository<Board, Integer> {
 
-	public int selectListCount(SqlSessionTemplate sqlSession) {
-		
-		return sqlSession.selectOne("boardMapper.selectListCount");
-	}
-
-	public ArrayList<Board> selectBoardList(SqlSessionTemplate sqlSession, PageInfo pi) {
-		
-		// 페이징처리의 원리 : 전체 목록을 최신순으로 정렬 후 구간별로 끊어서 조회해오기
-		// 1. 인라인뷰를 여러 겹 싸서 select 문 구현하기 - 성능 이슈는 없지만 구현 복잡
-		// 2. 마이바티스의 RowBounds 객체 이용하기 - 구현은 쉽지만 성능 이슈가 있음
-		
-		// limit : 한번에 몇개씩 조회할건지 (즉, boardLimit)
-		// offset : 앞에서 몇개를 건너뛸건지
-		int limit = pi.getBoardLimit();
-		int offset = (pi.getCurrentPage() - 1) * limit;
-		
-		RowBounds rowBounds = new RowBounds(offset, limit);
-		
-		return (ArrayList)sqlSession.selectList("boardMapper.selectBoardList", null, rowBounds);
-	}
-
-	public int selectSearchCount(SqlSessionTemplate sqlSession, String keyword) {
-		
-		return sqlSession.selectOne("boardMapper.selectSearchCount", keyword);
-	}
-
-	public ArrayList<Board> selectSearchList(SqlSessionTemplate sqlSession, PageInfo pi, String keyword) {
-		
-		int limit = pi.getBoardLimit();
-		int offset = (pi.getCurrentPage() - 1) * limit;
-		
-		RowBounds rowBounds = new RowBounds(offset, limit);
-		
-		return (ArrayList)sqlSession.selectList("boardMapper.selectSearchList", keyword, rowBounds);
-	}
-
-	public int insertBoard(SqlSessionTemplate sqlSession, Board b) {
-		
-		return sqlSession.insert("boardMapper.insertBoard", b);
-	}
-
-	public int increaseCount(SqlSessionTemplate sqlSession, int boardNo) {
-		
-		return sqlSession.update("boardMapper.increaseCount", boardNo);
-	}
-
-	public Board selectBoard(SqlSessionTemplate sqlSession, int boardNo) {
-		
-		return sqlSession.selectOne("boardMapper.selectBoard", boardNo);
-	}
-
-	public int updateBoard(SqlSessionTemplate sqlSession, Board b) {
-		
-		return sqlSession.update("boardMapper.updateBoard", b);
-	}
-
-	public int deleteBoard(SqlSessionTemplate sqlSession, int boardNo) {
-		
-		return sqlSession.update("boardMapper.deleteBoard", boardNo);
-	}
-
+	// 게시글 목록조회용 쿼리메소드
+	// > SELECT * FROM BOARD WHERE STATUS = 'Y' ORDER BY BOARD_NO DESC
+	Page<Board> findByStatusOrderByBoardNoDesc(String status, Pageable pageable);
+	// > 전체 조회용 쿼리메소드로 정의하되,
+	// > Pageable 을 같이 전달한다!! (알아서 페이지 구간별로 조회할 수 있도록)
+	// > 이 때, 반환형은 Page 가 된다!!
 	
+	// 게시글 검색용 쿼리메소드
+	// > SELECT * FROM BOARD
+	//   WHERE BOARD_TITLE LIKE '%' || ? || '%' AND STATUS = 'Y'
+	//	 ORDER BY BOARD_NO DESC
+	Page<Board> findByBoardTitleContainingAndStatusOrderByBoardNoDesc(String keyword, String status, Pageable pageable);
 	
+	// 게시글 상세조회용 조회수 증가용 JPQL
+	@Modifying
+	@Query("""
+				UPDATE Board b
+				   SET b.count = b.count + 1
+				 WHERE b.boardNo = :boardNo
+				   AND b.status = 'Y'
+			""")
+	int increaseCount(@Param("boardNo") int boardNo);
+	
+	// 게시글 삭재용 JPQL (소프트 삭제)
+	@Modifying
+	@Query("""
+				UPDATE Board b
+				   SET b.status = 'N'
+				 WHERE b.boardNo = :boardNo
+				   AND b.status = 'Y'
+			""")
+	int deleteBoard(@Param("boardNo") int boardNo);
+
 }

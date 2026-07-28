@@ -1,28 +1,23 @@
 package com.kh.myweb.board.model.service;
 
-import java.util.ArrayList;
+import java.util.List;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import com.kh.myweb.board.model.vo.Board;
-import com.kh.myweb.common.model.vo.PageInfo;
+import com.kh.myweb.board.model.vo.Reply;
 
 public interface BoardService {
 
-	// 게시글 목록 조회 + 페이징 처리용 서비스
-	// 총 게시글의 갯수를 구하는 서비스
-	int selectListCount();
-	
 	// 실제 게시글 목록을 조회해오는 서비스
-	ArrayList<Board> selectBoardList(PageInfo pi);
-	
-	// 게시글 검색 + 페이징 처리용 서비스
-	// 총 검색된 게시글의 갯수를 구하는 서비스
-	int selectSearchCount(String keyword);
+	Page<Board> selectBoardList(Pageable pageable);
 	
 	// 실제 검색된 게시글의 목록을 조회해오는 서비스
-	ArrayList<Board> selectSearchList(PageInfo pi, String keyowrd);
+	Page<Board> selectSearchList(String keyword, Pageable pageable);
 	
 	// 게시글 작성용 서비스
-	int insertBoard(Board b);
+	Board insertBoard(Board b);
 	
 	// 게시글 상세조회용 서비스
 	// 조회수 증가용 서비스
@@ -32,9 +27,21 @@ public interface BoardService {
 	Board selectBoard(int boardNo);
 	
 	// 게시글 수정용 서비스
-	int updateBoard(Board b);
+	Board updateBoard(Board b);
 	
 	// 게시글 삭제용 서비스
 	int deleteBoard(int boardNo);
+	
+	// 댓글 조회용 서비스
+	List<Reply> selectReplyList(int boardNo);
+	
+	// 댓글 작성용 서비스
+	Reply insertReply(Reply r);
+	
+	// 댓글 수정용 서비스
+	Reply updateReply(Reply r);
+	
+	// 댓글 삭제용 서비스
+	int deleteReply(int replyNo);
 	
 }

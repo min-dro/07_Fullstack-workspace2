@@ -11,8 +11,7 @@ function BoardEnrollFormComponent() {
 
     // 입력값을 저장할 객체 형식의 State 형 변수 셋팅
     const [board, setBoard] = useState({boardTitle : "",
-                                        boardContent : "",
-                                        boardWriter : "admin"});
+                                        boardContent : ""});
 
     // input type="file" 의 입력값을 DOM 으로부터 참조해서 가져오기 위한 변수 셋팅
     const upfileRef = useRef(null);

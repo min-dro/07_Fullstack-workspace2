@@ -15,7 +15,7 @@ function BoardDetailComponent() {
     // 화면에 출력할 게시글 데이터를 담을 State 형 변수
     const [board, setBoard] = useState({boardNo : "",
                                         boardTitle : "",
-                                        boardWriter : "",
+                                        member : {},
                                         boardContent : "",
                                         createDate : "",
                                         originName : "",
@@ -106,7 +106,7 @@ function BoardDetailComponent() {
                     </tr>
                     <tr>
                         <th>작성자</th>
-                        <td>{ board.boardWriter }</td>
+                        <td>{ board.member.userId }</td>
                         <th width="130">작성일</th>
                         <td>{ board.createDate.substring(0, 10) }</td>
                     </tr>
