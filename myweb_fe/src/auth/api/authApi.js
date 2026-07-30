@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const BASE_URL = "http://localhost:8006/myweb/auth";
+const BASE_URL = "http://3.35.201.88:8006/myweb/auth";
 
 // 인증 요청용
 const loginMemberApi = member => {

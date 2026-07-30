@@ -10,9 +10,12 @@ import { getAuthorization } from "../../common/api/commonApi";
 // 이 파일 내의 모든 함수에서 공통적을
 // "http://localhost:8006/myweb/members" 까지가 공통 호출 URL 주소임!!
 // > 전역변수로 빼기
-const BASE_URL = "http://localhost:8006/myweb/members";
+const BASE_URL = "http://3.35.201.88:8006/myweb/members";
 // > 추후 운영 또는 배포상의 이유로 ip주소 또는 포트번호 또는 context path 등이 변경되면
 //   이 변수값만 수정하면 모두 반영됨!!
+// > 실제 배포 시에는 localhost 대신 EC2 의 퍼블릭 IP를 작성해야함!!
+// > EC2 의 퍼블릭 IP 는 매번 유동적인 값이기 때문에 고정해두고 쓰고 싶다면
+//   탄력적 IP 를 연결해서 쓰면 된다!!
 
 // 회원 목록 조회용
 const selectMemberListApi = () => {

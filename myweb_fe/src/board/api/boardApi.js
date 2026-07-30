@@ -2,7 +2,7 @@ import axios from "axios";
 
 import { getAuthorization } from "../../common/api/commonApi";
 
-const BASE_URL = "http://localhost:8006/myweb/boards";
+const BASE_URL = "http://3.35.201.88:8006/myweb/boards";
 
 // 일반게시글 목록 조회용
 const selectBoardListApi = cpage => {

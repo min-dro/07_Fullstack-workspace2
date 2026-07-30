@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
@@ -30,6 +31,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.kh.myweb.auth.controller.AuthController;
 import com.kh.myweb.board.model.service.BoardService;
 import com.kh.myweb.board.model.vo.Board;
+import com.kh.myweb.board.model.vo.Reply;
 import com.kh.myweb.common.model.vo.PageInfo;
 import com.kh.myweb.common.template.FileRenamePolicy;
 import com.kh.myweb.common.template.Pagination;
@@ -377,6 +379,92 @@ public class BoardController {
 		
 		return ResponseEntity.status(HttpStatus.OK)
 							 .body(message);
+	}
+	
+	// 댓글 조회용 컨트롤러
+	@GetMapping("/replys/{boardNo}")
+	public ResponseEntity<List<Reply>> selectReplyList(@PathVariable int boardNo) {
+		
+		List<Reply> list = boardService.selectReplyList(boardNo);
+		
+		return ResponseEntity.status(HttpStatus.OK)
+							 .body(list);
+	}
+	
+	// 댓글 작성용 컨트롤러
+	@PostMapping("/replys")
+	public ResponseEntity<String> insertReply(HttpServletRequest request, Reply r, int boardNo) {
+		
+		String authHeader = request.getHeader("Authorization");
+		String jwtTokenString = authHeader.substring(7);
+		
+		Key key = Keys.hmacShaKeyFor(AuthController.SECRET_KEY
+										.getBytes(StandardCharsets.UTF_8));
+		
+		Claims claims = Jwts.parserBuilder()
+							.setSigningKey(key)
+							.build()
+							.parseClaimsJws(jwtTokenString)
+							.getBody();
+		
+		String userId = claims.getSubject();
+		
+		Member m = memberService.selectMember(userId);
+		Board b = boardService.selectBoard(boardNo);
+		
+		r.setBoard(b);
+		r.setMember(m);
+		
+		Reply insertR = boardService.insertReply(r);
+		
+		String result = (insertR != null) ? "success" : "fail";
+		
+		return ResponseEntity.status(HttpStatus.OK)
+							 .body(result);
+	}
+	
+	// 댓글 수정용 컨트롤러
+	@PutMapping("/replys")
+	public ResponseEntity<String> updateReply(HttpServletRequest request, Reply r, int boardNo) {
+		
+		String authHeader = request.getHeader("Authorization");
+		String jwtTokenString = authHeader.substring(7);
+		
+		Key key = Keys.hmacShaKeyFor(AuthController.SECRET_KEY
+										.getBytes(StandardCharsets.UTF_8));
+		
+		Claims claims = Jwts.parserBuilder()
+							.setSigningKey(key)
+							.build()
+							.parseClaimsJws(jwtTokenString)
+							.getBody();
+		
+		String userId = claims.getSubject();
+		
+		Member m = memberService.selectMember(userId);
+		Board b = boardService.selectBoard(boardNo);
+		
+		r.setBoard(b);
+		r.setMember(m);
+		
+		Reply updateR = boardService.updateReply(r);
+		
+		String result = (updateR != null) ? "success" : "fail";
+		
+		return ResponseEntity.status(HttpStatus.OK)
+							 .body(result);
+	}
+	
+	// 댓글 삭제용 컨트롤러
+	@DeleteMapping("/replys/{replyNo}")
+	public ResponseEntity<String> deleteReply(@PathVariable int replyNo) {
+		
+		int num = boardService.deleteReply(replyNo);
+		
+		String result = (num > 0) ? "success" : "fail";
+		
+		return ResponseEntity.status(HttpStatus.OK)
+							 .body(result);
 	}
 	
 }
