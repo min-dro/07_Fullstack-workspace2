@@ -19,11 +19,20 @@ import com.kh.myweb.member.model.vo.Member;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
+@Tag(name="Auth API")
 @CrossOrigin
 @RestController
 public class AuthController {
 
+	// Logger 객체를 전역변수로 셋팅
+	// private Logger logger = LoggerFactory.getLogger(AuthController.class);
+	// > 직접 셋팅하지 말고 @Slf4j (롬복 어노테이션) 를 이용해서 생성
+	
 	// 비밀키를 전역 변수 겸 상수 필드로 빼기
 	public static final String SECRET_KEY = "Hello123KHAcademy456Gangnam789WelcomeToHClass0";
 	
@@ -35,10 +44,20 @@ public class AuthController {
 	
 	// 로그인(인증) 용 컨트롤러 - 어느 계정이든 로그인이 됨 (관리자든 일반사용자든)
 	// > 범용으로 만들어서 일반 사용자 페이지의 로그인 구현 시에도 재활용 하면 된다!!
+	@Operation(summary="로그인", description="userId 와 userPwd로 회원 한 명의 정보를 JWT 토큰에 저장합니다.")
 	@PostMapping("/auth/login")
 	public ResponseEntity<String> loginMember(@RequestBody Member m) {
 		
 		// System.out.println(m);
+		// > 기존에는 sysout 구문을 이용해서 디버깅 후 확인되면 주석처리를 하고 넘어갔었음!!
+		
+		// logger.debug(m);
+		// > Logback 을 이용하기 위해 Logger 객체 생성 후 debug 메소드를 통해 디버깅
+		//   단, 공식적인 출력문은 아니기 때문에 객체 단위로 출력할 경우 toString() 이 안먹힌다.
+		
+		log.debug("로그인 요청한 회원의 정보 : {}", m);
+		// > 무조건 String 타입의 인자로 출력해야하기 때문에, 그 외의 타입을 디버깅해보고 싶다면
+		//   "문자열" 안에 {} 로 구멍을 뚫고, 뒤에 메꿀 값을 나열한다!! (printf 처럼)
 		
 		// 우선 아이디만 일치하는지를 검사
 		Member loginUser = authService.loginMember(m.getUserId());
@@ -93,7 +112,7 @@ public class AuthController {
 			 * 3. Signature : 서명
 			 * 				  Header 와 Payload 값을 암호화한 정보를 합쳐놓은 부분
 			 * 				  인가 기능에서 권한 등을 체크할 때 주로 사용
-			 * 				  (제대호된 데이터인지 검증, 데이터의 위변조 여부 판별이 핵심 역할임)
+			 * 				  (제대로된 데이터인지 검증, 데이터의 위변조 여부 판별이 핵심 역할임)
 			 * 
 			 * => 만약 Signature 내용을 복호화해서 풀었는데
 			 * 	  Payload 내용과 복호화한 Payload 내용이 다르다면, 위변조 된 것!!
@@ -136,7 +155,7 @@ public class AuthController {
 			 * - Signature : Header 및 Payload 내용의 암호화된 결과를 이어붙인것
 			 */
 			
-			// 4. 이 만들어진 JWT 문자열을 응답데이터로 넘기시
+			// 4. 이 만들어진 JWT 문자열을 응답데이터로 넘기기
 			return ResponseEntity.status(HttpStatus.OK)
 								 .body(jwt);
 		

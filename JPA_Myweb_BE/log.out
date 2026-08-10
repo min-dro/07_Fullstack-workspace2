@@ -1,0 +1,104 @@
+INFO : com.kh.myweb.MyWebBeApplication - Starting MyWebBeApplication using Java 21.0.10 with PID 21492 (C:\07_Fullstack-workspace2\JPA_Myweb_BE\target\classes started by user1 in C:\07_Fullstack-workspace2\JPA_Myweb_BE) 2026-08-05 18:47:25 
+INFO : com.kh.myweb.MyWebBeApplication - No active profile set, falling back to 1 default profile: "default" 2026-08-05 18:47:25 
+INFO : org.springframework.data.repository.config.RepositoryConfigurationDelegate - Bootstrapping Spring Data JPA repositories in DEFAULT mode. 2026-08-05 18:47:26 
+INFO : org.springframework.data.repository.config.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 19 ms. Found 5 JPA repository interfaces. 2026-08-05 18:47:26 
+WARN : org.mybatis.spring.mapper.ClassPathMapperScanner - No MyBatis mapper was found in '[com.kh.myweb]' package. Please check your configuration. 2026-08-05 18:47:26 
+INFO : org.springframework.boot.tomcat.TomcatWebServer - Tomcat initialized with port 8006 (http) 2026-08-05 18:47:26 
+INFO : org.apache.coyote.http11.Http11NioProtocol - Initializing ProtocolHandler ["http-nio-8006"] 2026-08-05 18:47:26 
+INFO : org.apache.catalina.core.StandardService - Starting service [Tomcat] 2026-08-05 18:47:26 
+INFO : org.apache.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/11.0.22] 2026-08-05 18:47:26 
+INFO : org.springframework.boot.web.context.servlet.WebApplicationContextInitializer - Root WebApplicationContext: initialization completed in 309 ms 2026-08-05 18:47:26 
+INFO : org.hibernate.orm.jpa - HHH008540: Processing PersistenceUnitInfo [name: default] 2026-08-05 18:47:26 
+INFO : org.springframework.orm.jpa.persistenceunit.SpringPersistenceUnitInfo - No LoadTimeWeaver setup: ignoring JPA class transformer 2026-08-05 18:47:26 
+INFO : com.zaxxer.hikari.HikariDataSource - HikariPool-68 - Starting... 2026-08-05 18:47:26 
+INFO : com.zaxxer.hikari.pool.HikariPool - HikariPool-68 - Added connection com.mysql.cj.jdbc.ConnectionImpl@12b7e2a1 2026-08-05 18:47:26 
+INFO : com.zaxxer.hikari.HikariDataSource - HikariPool-68 - Start completed. 2026-08-05 18:47:26 
+WARN : org.hibernate.orm.deprecation - HHH90000025: MySQLDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default) 2026-08-05 18:47:26 
+INFO : org.hibernate.orm.connections.pooling - HHH10001005: Database info:
+	Database JDBC URL [jdbc:mysql://localhost:3306/fullstack]
+	Database driver: MySQL Connector/J
+	Database dialect: MySQLDialect
+	Database version: 8.0.46
+	Default catalog/schema: fullstack/undefined
+	Autocommit mode: undefined/unknown
+	Isolation level: REPEATABLE_READ [default REPEATABLE_READ]
+	JDBC fetch size: none
+	Pool: DataSourceConnectionProvider
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown 2026-08-05 18:47:26 
+INFO : org.hibernate.orm.core - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration) 2026-08-05 18:47:26 
+INFO : org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean - Initialized JPA EntityManagerFactory for persistence unit 'default' 2026-08-05 18:47:26 
+WARN : org.springframework.boot.jpa.autoconfigure.JpaBaseConfiguration$JpaWebConfiguration - spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning 2026-08-05 18:47:26 
+WARN : org.springframework.boot.security.autoconfigure.UserDetailsServiceAutoConfiguration - 
+
+Using generated security password: 01b23b90-c56d-4ec5-b128-86fe25b2f749
+
+This generated password is for development use only. Your security configuration must be updated before running your application in production.
+ 2026-08-05 18:47:26 
+INFO : org.springframework.security.config.annotation.authentication.configuration.InitializeUserDetailsBeanManagerConfigurer$InitializeUserDetailsManagerConfigurer - Global AuthenticationManager configured with UserDetailsService bean with name inMemoryUserDetailsManager 2026-08-05 18:47:26 
+INFO : org.apache.coyote.http11.Http11NioProtocol - Starting ProtocolHandler ["http-nio-8006"] 2026-08-05 18:47:26 
+INFO : org.springframework.boot.tomcat.TomcatWebServer - Tomcat started on port 8006 (http) with context path '/myweb' 2026-08-05 18:47:26 
+INFO : com.kh.myweb.MyWebBeApplication - Started MyWebBeApplication in 0.733 seconds (process running for 12484.135) 2026-08-05 18:47:26 
+WARN : org.springdoc.core.events.SpringDocAppInitializer - SpringDoc /v3/api-docs endpoint is enabled by default. To disable it in production, set the property 'springdoc.api-docs.enabled=false' 2026-08-05 18:47:26 
+WARN : org.springdoc.core.events.SpringDocAppInitializer - SpringDoc /swagger-ui.html endpoint is enabled by default. To disable it in production, set the property 'springdoc.swagger-ui.enabled=false' 2026-08-05 18:47:26 
+INFO : org.springframework.boot.devtools.autoconfigure.ConditionEvaluationDeltaLoggingListener - Condition evaluation unchanged 2026-08-05 18:47:26 
+INFO : org.springframework.boot.devtools.autoconfigure.LocalDevToolsAutoConfiguration$RestartingClassPathChangeChangedEventListener - Restarting due to 1 class path change (0 additions, 0 deletions, 1 modification) 2026-08-05 18:48:15 
+INFO : org.springframework.boot.tomcat.GracefulShutdown - Commencing graceful shutdown. Waiting for active requests to complete 2026-08-05 18:48:15 
+INFO : org.apache.coyote.http11.Http11NioProtocol - Pausing ProtocolHandler ["http-nio-8006"] 2026-08-05 18:48:15 
+INFO : org.springframework.boot.tomcat.GracefulShutdown - Graceful shutdown complete 2026-08-05 18:48:15 
+INFO : org.apache.coyote.http11.Http11NioProtocol - Stopping ProtocolHandler ["http-nio-8006"] 2026-08-05 18:48:15 
+INFO : org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean - Closing JPA EntityManagerFactory for persistence unit 'default' 2026-08-05 18:48:15 
+INFO : com.zaxxer.hikari.HikariDataSource - HikariPool-68 - Shutdown initiated... 2026-08-05 18:48:15 
+INFO : com.zaxxer.hikari.HikariDataSource - HikariPool-68 - Shutdown completed. 2026-08-05 18:48:15 
+INFO : com.kh.myweb.MyWebBeApplication - Starting MyWebBeApplication using Java 21.0.10 with PID 21492 (C:\07_Fullstack-workspace2\JPA_Myweb_BE\target\classes started by user1 in C:\07_Fullstack-workspace2\JPA_Myweb_BE) 2026-08-05 18:48:15 
+INFO : com.kh.myweb.MyWebBeApplication - No active profile set, falling back to 1 default profile: "default" 2026-08-05 18:48:15 
+INFO : org.springframework.data.repository.config.RepositoryConfigurationDelegate - Bootstrapping Spring Data JPA repositories in DEFAULT mode. 2026-08-05 18:48:15 
+INFO : org.springframework.data.repository.config.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 24 ms. Found 5 JPA repository interfaces. 2026-08-05 18:48:15 
+WARN : org.mybatis.spring.mapper.ClassPathMapperScanner - No MyBatis mapper was found in '[com.kh.myweb]' package. Please check your configuration. 2026-08-05 18:48:15 
+INFO : org.springframework.boot.tomcat.TomcatWebServer - Tomcat initialized with port 8006 (http) 2026-08-05 18:48:15 
+INFO : org.apache.coyote.http11.Http11NioProtocol - Initializing ProtocolHandler ["http-nio-8006"] 2026-08-05 18:48:15 
+INFO : org.apache.catalina.core.StandardService - Starting service [Tomcat] 2026-08-05 18:48:15 
+INFO : org.apache.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/11.0.22] 2026-08-05 18:48:15 
+INFO : org.springframework.boot.web.context.servlet.WebApplicationContextInitializer - Root WebApplicationContext: initialization completed in 280 ms 2026-08-05 18:48:15 
+INFO : org.hibernate.orm.jpa - HHH008540: Processing PersistenceUnitInfo [name: default] 2026-08-05 18:48:15 
+INFO : org.springframework.orm.jpa.persistenceunit.SpringPersistenceUnitInfo - No LoadTimeWeaver setup: ignoring JPA class transformer 2026-08-05 18:48:15 
+INFO : com.zaxxer.hikari.HikariDataSource - HikariPool-69 - Starting... 2026-08-05 18:48:15 
+INFO : com.zaxxer.hikari.pool.HikariPool - HikariPool-69 - Added connection com.mysql.cj.jdbc.ConnectionImpl@3206b484 2026-08-05 18:48:15 
+INFO : com.zaxxer.hikari.HikariDataSource - HikariPool-69 - Start completed. 2026-08-05 18:48:15 
+WARN : org.hibernate.orm.deprecation - HHH90000025: MySQLDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default) 2026-08-05 18:48:15 
+INFO : org.hibernate.orm.connections.pooling - HHH10001005: Database info:
+	Database JDBC URL [jdbc:mysql://localhost:3306/fullstack]
+	Database driver: MySQL Connector/J
+	Database dialect: MySQLDialect
+	Database version: 8.0.46
+	Default catalog/schema: fullstack/undefined
+	Autocommit mode: undefined/unknown
+	Isolation level: REPEATABLE_READ [default REPEATABLE_READ]
+	JDBC fetch size: none
+	Pool: DataSourceConnectionProvider
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown 2026-08-05 18:48:15 
+INFO : org.hibernate.orm.core - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration) 2026-08-05 18:48:15 
+INFO : org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean - Initialized JPA EntityManagerFactory for persistence unit 'default' 2026-08-05 18:48:16 
+WARN : org.springframework.boot.jpa.autoconfigure.JpaBaseConfiguration$JpaWebConfiguration - spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning 2026-08-05 18:48:16 
+WARN : org.springframework.boot.security.autoconfigure.UserDetailsServiceAutoConfiguration - 
+
+Using generated security password: 528163b2-34ed-43dd-87b3-adead14f88e6
+
+This generated password is for development use only. Your security configuration must be updated before running your application in production.
+ 2026-08-05 18:48:16 
+INFO : org.springframework.security.config.annotation.authentication.configuration.InitializeUserDetailsBeanManagerConfigurer$InitializeUserDetailsManagerConfigurer - Global AuthenticationManager configured with UserDetailsService bean with name inMemoryUserDetailsManager 2026-08-05 18:48:16 
+INFO : org.apache.coyote.http11.Http11NioProtocol - Starting ProtocolHandler ["http-nio-8006"] 2026-08-05 18:48:16 
+INFO : org.springframework.boot.tomcat.TomcatWebServer - Tomcat started on port 8006 (http) with context path '/myweb' 2026-08-05 18:48:16 
+INFO : com.kh.myweb.MyWebBeApplication - Started MyWebBeApplication in 0.819 seconds (process running for 12533.918) 2026-08-05 18:48:16 
+WARN : org.springdoc.core.events.SpringDocAppInitializer - SpringDoc /v3/api-docs endpoint is enabled by default. To disable it in production, set the property 'springdoc.api-docs.enabled=false' 2026-08-05 18:48:16 
+WARN : org.springdoc.core.events.SpringDocAppInitializer - SpringDoc /swagger-ui.html endpoint is enabled by default. To disable it in production, set the property 'springdoc.swagger-ui.enabled=false' 2026-08-05 18:48:16 
+INFO : org.springframework.boot.devtools.autoconfigure.ConditionEvaluationDeltaLoggingListener - Condition evaluation unchanged 2026-08-05 18:48:16 
+INFO : org.springframework.boot.admin.SpringApplicationAdminMXBeanRegistrar$SpringApplicationAdmin - Application shutdown requested. 2026-08-05 18:49:36 
+INFO : org.springframework.boot.tomcat.GracefulShutdown - Commencing graceful shutdown. Waiting for active requests to complete 2026-08-05 18:49:36 
+INFO : org.apache.coyote.http11.Http11NioProtocol - Pausing ProtocolHandler ["http-nio-8006"] 2026-08-05 18:49:36 
+INFO : org.springframework.boot.tomcat.GracefulShutdown - Graceful shutdown complete 2026-08-05 18:49:36 
+INFO : org.apache.coyote.http11.Http11NioProtocol - Stopping ProtocolHandler ["http-nio-8006"] 2026-08-05 18:49:36 
+INFO : org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean - Closing JPA EntityManagerFactory for persistence unit 'default' 2026-08-05 18:49:36 
+INFO : com.zaxxer.hikari.HikariDataSource - HikariPool-69 - Shutdown initiated... 2026-08-05 18:49:36 
+INFO : com.zaxxer.hikari.HikariDataSource - HikariPool-69 - Shutdown completed. 2026-08-05 18:49:36 

@@ -138,6 +138,32 @@
 			<artifactId>spring-boot-starter-data-jpa-test</artifactId>
 			<scope>test</scope>
 		</dependency>
+		
+		<!--
+			* 프론트엔드를 React 나 Vue 와 같은 별도의 라이브러리로 구현함으로써
+			  프론트엔드 개발자와 백엔드 개발자가 협업할 일이 잦아짐!!
+			  
+			- 프론트엔드 개발자 입장에서는 백엔드 (특히 RestAPI 형식의 컨트롤러 구조) 를 잘 모름!!
+			- 그래도 내가 만든 화면 상에서 기능을 붙이려면 백엔드쪽 컨트롤러를 호출하고,
+			  그에 따른 응답데이터의 구조를 파악할 수 있어야 한다!!
+			- 그래서 필요한게 RestAPI 에 대한 기술 문서임 (개발자 문서)
+				
+			* Swagger
+			
+			- 백엔드 개발자 입장에서는 일일이 프론트엔드 개발자를 위한 개발자를 위한 개발자 문서를 다 만들 수 없음!!
+			- 그래서 그 백엔드 개발자 문서의 템플릿을 잡고, 문서 완성을 도와주는 도구를 Swagger 라고 한다.
+			- Springdoc 이라고도 부른다. (사실 상 Spring 의 표준)
+			- 라이브러리 연동 후
+			  http://localhost:8006/myweb/swagger-ui/index.html
+			  으로 접속하면 기본개발자 문서의 틀이 잡혀져있음!!
+			  (application.properties 에서 지정한 port 번호, context path 는 그대로 써야함)
+			- 단순 문서 작업 뿐만 아니라, 실제 url 주소로 요청하여 (curl 명령문) 테스트 기능도 이용할 수 있다!!
+		-->
+		<dependency>
+		    <groupId>org.springdoc</groupId>
+		    <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+		    <version>3.0.3</version>
+		</dependency>
 	</dependencies>
 
 	<build>

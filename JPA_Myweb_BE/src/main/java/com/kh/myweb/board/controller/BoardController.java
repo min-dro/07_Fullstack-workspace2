@@ -17,6 +17,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -24,7 +25,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -35,15 +38,25 @@ import com.kh.myweb.board.model.vo.Reply;
 import com.kh.myweb.common.model.vo.PageInfo;
 import com.kh.myweb.common.template.FileRenamePolicy;
 import com.kh.myweb.common.template.Pagination;
+import com.kh.myweb.common.template.XssDefencePolicy;
 import com.kh.myweb.member.model.service.MemberService;
 import com.kh.myweb.member.model.vo.Member;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 
+@Tag(name="Board API", description="게시판, 댓글 조회/작성/수정/삭제 관련 API")
 @CrossOrigin
 @RestController
 public class BoardController {
@@ -55,6 +68,25 @@ public class BoardController {
 	private MemberService memberService;
 	
 	// 일반게시글 목록 조회용 컨트롤러
+	@Operation(summary="게시글 목록 조회 (페이징)", description="페이지 번호 (cpage) 에 해당하는 게시글 목록을 조회합니다. "
+														    + "응답 : {list : 게시글 목록, pi : 페이지정보}")
+	@ApiResponse(responseCode="200", description="조회 성공",
+				 content=@Content(mediaType="application/json",
+						 		  examples=@ExampleObject(value="""
+							 		  			{
+							 		  				"list" : [{}, {}, {}],
+							 		  				"pi" : {
+							 		  					"listCount" : 42,
+							 		  					"currentPage" : 1,
+							 		  					"pageLimit" : 5,
+							 		  					"boardLimit" : 5,
+							 		  					"maxPage" : 9,
+							 		  					"startPage" : 1,
+							 		  					"endPage" : 5
+							 		  				}
+							 		  			}
+						 		  		""")))
+	// > 응답데이터가 HashMap 처럼 복잡한 구조일 경우 (Schema 의 example 로 해결되지 않을 경우) 위와 같이 직접 작성도 가능!!
 	@GetMapping("/boards")
 	public ResponseEntity<HashMap<String, Object>> selectBoardList(
 				@RequestParam(value="cpage", defaultValue="1") int currentPage) {
@@ -127,6 +159,24 @@ public class BoardController {
 	}
 	
 	// 일반게시글 검색용 컨트롤러
+	@Operation(summary="게시글 검색 조회 (페이징)", description="키워드 (keyword) 와 페이지 번호 (cpage) 에 해당하는 게시글 목록을 조회합니다."
+														 + "응답 : {list : 게시글 목록, pi : 페이지 정보}")
+	@ApiResponse(responseCode="200", description="조회 성공",
+				 content=@Content(mediaType="application/json",
+						 		  examples=@ExampleObject(value="""
+						 		  				{
+						 		  					"list" : [{}, {}, {}],
+						 		  					"pi" : {
+						 		  						"listcount" : 42,
+						 		  						"currentPage" : 1,
+						 		  						"pageLimit" : 5,
+						 		  						"boardLimit" : 5,
+						 		  						"maxPage" : 9,
+						 		  						"startPage" : 1,
+						 		  						"endPage" : 5
+						 		  					}
+						 		  				}
+						 		  		""")))
 	@GetMapping("/boards/search")
 	public ResponseEntity<HashMap<String, Object>> searchBoardList(
 			@RequestParam(value="cpage", defaultValue="1") int currentPage,
@@ -160,11 +210,20 @@ public class BoardController {
 	}
 	
 	// 일반게시글 작성용 컨트롤러
-	@PostMapping("/boards")
-	public ResponseEntity<String> insertBoard(Board b, MultipartFile upfile,
-										   			   HttpSession session,
-										   			   HttpServletRequest request) {
-	
+	@Operation(summary="게시글 작성 (첨부파일 가능)", description="게시글을 작성합니다.")
+	@PostMapping(value="/boards", consumes=MediaType.MULTIPART_FORM_DATA_VALUE)
+	// > consumes, @RequestPart 를 더 작성하면, Swagger 문서 상에서 파일 업로드 테스트가 가능해진다!!
+	public ResponseEntity<String> insertBoard(@RequestPart Board b, 
+											  @RequestPart(value = "upfile", required = false)
+										      MultipartFile upfile,
+							   			      // > @RequestPart : multipart/form-data 요청으로부터
+										      //				  요청 시 전달값을 조각별로 꺼내오는 어노테이션
+										      HttpSession session,
+							   			      HttpServletRequest request) {
+
+		b.setBoardTitle(XssDefencePolicy.defence(b.getBoardTitle()));
+		b.setBoardContent(XssDefencePolicy.defence(b.getBoardContent()));
+		
 		// 작성자 (로그인한 회원) 정보 뽑기
 		String authHeader = request.getHeader("Authorization");
 		String jwtTokenString = authHeader.substring(7);
@@ -223,6 +282,11 @@ public class BoardController {
 	}
 	
 	// 일반게시글 상세조회용 컨트롤러
+	@Operation(summary="게시글 상세 조회", description="boardNo로 한개의 게시글의 상세 정보를 조회합니다.")
+	@ApiResponses({
+		@ApiResponse(responseCode="200", description="조회 성공"),
+		@ApiResponse(responseCode="200 (null)", description ="해당 글번호의 게시글이 없을 경우 body 가 null 로 응답됨")
+	})
 	@GetMapping("/boards/{boardNo}")
 	public ResponseEntity<Board> selectBoard(@PathVariable int boardNo) {
 		
@@ -247,6 +311,11 @@ public class BoardController {
 	}
 	
 	// 첨부파일 다운로드용 컨트롤러
+	@Operation(summary="첨부파일 다운로드", description="changeName과 originName으로 첨부파일의 리소스를 출력합니다.")
+	@ApiResponses({
+		@ApiResponse(responseCode="200", description="출력 성공"),
+		@ApiResponse(responseCode="404 (null)", description="해당 파일이 존재하지 않을 경우 body 가 null 로 응답함")
+	})
 	@GetMapping("/boards/download/{changeName}/{originName}")
 	public ResponseEntity<Resource> upfileDownload(@PathVariable String changeName,
 												   @PathVariable String originName,
@@ -297,8 +366,15 @@ public class BoardController {
 	}
 	
 	// 수정용 일반게시글 상세 조회용 컨트롤러
+	@Operation(summary="수정용 게시글 상세 조회", description="boardNo로 한개의 게시글의 수정용 상세 정보를 조회합니다.")
+	@ApiResponses({
+		@ApiResponse(responseCode="200", description="조회 성공"),
+		@ApiResponse(responseCode="200 (null)", description="해당 글번호의 게시글이 없을 경우 body 가 null 로 응답됨")
+	})
+	// > @ApiResponses 으로 다양한 상황의 응답 정보들을 묶어서 표현도 가능함!!
 	@GetMapping("/boards/{boardNo}/form")
-	public ResponseEntity<Board> selectBoardForm(@PathVariable int boardNo) {
+	public ResponseEntity<Board> selectBoardForm(@Parameter(description="조회할 게시글의 글번호", example="1", required=true)
+												 @PathVariable int boardNo) {
 		
 		// 컨트롤러는 재활용이 안되지만, 서비스부터는 재활용 가능!!
 		Board b = boardService.selectBoard(boardNo);
@@ -308,14 +384,25 @@ public class BoardController {
 	}
 	
 	// 일반게시글 수정용 컨트롤러
-	@PostMapping("/boards/{boardNo}")
-	public ResponseEntity<String> updateBoard(@PathVariable int boardNo,
-											  Board b,
+	@Operation(summary="게시글 정보 수정 (첨부파일 수정 가능)", description="게시글을 수정합니다.")
+	@ApiResponses({
+		@ApiResponse(responseCode="200", description="요청 처리 완료 (body 로 성공/실패 구분)",
+					 content=@Content(mediaType="text/plain",
+							 		  examples= {
+							 				  @ExampleObject(name="수정 성공", value="success"),
+							 				  @ExampleObject(name="수정 실패", value="fail")
+							 		  }))
+	})
+	@PostMapping(value="/boards/{boardNo}", consumes=MediaType.MULTIPART_FORM_DATA_VALUE)
+	public ResponseEntity<String> updateBoard(@Parameter(description="수정할 게시글의 글번호", example="1", required=true) @PathVariable int boardNo,
+											  @RequestPart Board b,
+											  @RequestPart(value = "reupfile", required = false)
 											  MultipartFile reupfile,
 											  HttpSession session) {
 		
 		// System.out.println(boardNo);
-		
+		b.setBoardTitle(XssDefencePolicy.defence(b.getBoardTitle()));
+		b.setBoardContent(XssDefencePolicy.defence(b.getBoardContent()));
 		System.out.println(b);
 		// > 기존에 첨부파일이 있다면 originName, changeName 필드값이 !equals("null")
 		
@@ -369,6 +456,15 @@ public class BoardController {
 	}
 	
 	// 일반게시글 삭제용 컨트롤러
+	@Operation(summary="게시글 삭제", description="게시글을 삭제하여 정보가 조회되지 않게합니다. 상태값을 N으로 변경합니다.")
+	@ApiResponses({
+		@ApiResponse(responseCode="200", description="요청 처리 완료 (body 로 성공/실패 구분)",
+					 content=@Content(mediaType="text/plain",
+							 		  examples= {
+							 				  @ExampleObject(name="삭제 성공", value="success"),
+							 				  @ExampleObject(name="삭제 실패", value="fail")
+							 		  }))
+	})
 	@DeleteMapping("/boards/{boardNo}")
 	public ResponseEntity<String> deleteBoard(@PathVariable int boardNo) {
 		
@@ -382,8 +478,11 @@ public class BoardController {
 	}
 	
 	// 댓글 조회용 컨트롤러
+	@Operation(summary="댓글 목록 조회", description="게시글 글번호 (boardNo) 에 해당하는 댓글 목록을 조회합니다.")
+	@ApiResponse(responseCode="200", description="조회 성공")
 	@GetMapping("/replys/{boardNo}")
-	public ResponseEntity<List<Reply>> selectReplyList(@PathVariable int boardNo) {
+	public ResponseEntity<List<Reply>> selectReplyList(@Parameter(description="조회할 게시글의 글번호", example="1", required=true)
+													   @PathVariable int boardNo) {
 		
 		List<Reply> list = boardService.selectReplyList(boardNo);
 		
@@ -392,9 +491,15 @@ public class BoardController {
 	}
 	
 	// 댓글 작성용 컨트롤러
-	@PostMapping("/replys")
-	public ResponseEntity<String> insertReply(HttpServletRequest request, Reply r, int boardNo) {
+	@Operation(summary="댓글 작성", description="댓글을 작성합니다. JWT 토큰에서는 작성자 정보를 추출하므로 로그인이 필요합니다.")
+	@ApiResponse(responseCode="200", description="body 로 success/fail 응답")
+	@SecurityRequirement(name="JWT")
+	@PostMapping("/replys/{boardNo}")
+	public ResponseEntity<String> insertReply(HttpServletRequest request, @RequestBody Reply r, 
+											  @Parameter(description="조회할 게시글의 글번호", example="1", required=true)
+											  @PathVariable int boardNo) {
 		
+		r.setReplyContent(XssDefencePolicy.defence(r.getReplyContent()));
 		String authHeader = request.getHeader("Authorization");
 		String jwtTokenString = authHeader.substring(7);
 		
@@ -424,8 +529,20 @@ public class BoardController {
 	}
 	
 	// 댓글 수정용 컨트롤러
-	@PutMapping("/replys")
-	public ResponseEntity<String> updateReply(HttpServletRequest request, Reply r, int boardNo) {
+	@Operation(summary="댓글 정보 수정", description="댓글 정보를 수정합니다. JWT 토큰에서는 작성자 정보를 추출하므로 로그인이 필요합니다.")
+	@ApiResponses({
+		@ApiResponse(responseCode="200", description="요청 처리 완료 (body 로 성공/실패 구분)",
+					 content=@Content(mediaType="text/plain",
+							 		  examples= {
+							 				  @ExampleObject(name="수정 성공", value="success"),
+							 				  @ExampleObject(name="수정 실패", value="fail")
+							 		  }))
+	})
+	@SecurityRequirement(name="JWT")
+	@PutMapping("/replys/{boardNo}")
+	public ResponseEntity<String> updateReply(HttpServletRequest request, @RequestBody Reply r, 
+											  @Parameter(description="조회할 게시글의 글번호", example="1", required=true)
+											  @PathVariable int boardNo) {
 		
 		String authHeader = request.getHeader("Authorization");
 		String jwtTokenString = authHeader.substring(7);
@@ -456,8 +573,18 @@ public class BoardController {
 	}
 	
 	// 댓글 삭제용 컨트롤러
+	@Operation(summary="댓글 삭제", description="댓글을 삭제하여 정보가 조회되지 않게합니다. 상태값을 N으로 변경합니다.")
+	@ApiResponses({
+		@ApiResponse(responseCode="200", description="요청 처리 완료 (body 로 성공/실패 구분)",
+					 content=@Content(mediaType="text/plain",
+							 		  examples= {
+							 				  @ExampleObject(name="수정 성공", value="success"),
+							 				  @ExampleObject(name="수정 실패", value="fail")
+							 		  }))
+	})
 	@DeleteMapping("/replys/{replyNo}")
-	public ResponseEntity<String> deleteReply(@PathVariable int replyNo) {
+	public ResponseEntity<String> deleteReply(@Parameter(description="삭제할 댓글의 글번호", example="1", required=true)
+											  @PathVariable int replyNo) {
 		
 		int num = boardService.deleteReply(replyNo);
 		

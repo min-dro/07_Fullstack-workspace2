@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+	* Logging 을 남기기 위한 기본 사전지식
+	
+	- Logging 시 "메세지 레벨" 을 명시한다.
+	  (기록되는 메세지에 중요를 매긴다 - Log4j : 6단계까지 있음 / Logback : 5단계까지 있음)
+	- 6단계로 갈수록 중요, 6단계로 갈수록 발생 빈도가 높지 않음!! (1단계로 갈수록 자주일어남)
+
+	1단계. TRACE
+	프로그앰 내에서 발생하는 모든 사소한 작업을 다 기록하는 용도의 레벨 (시시콜콜한것 까지 모두 다)
+	
+	2단계. DEBUG
+	개발할 떄 필요에 의해서 확인해야하는 부분에 대한 기록하는 용도의 레벨 (어느 시점에 어느 변수에 무슨값이 들어갔는지 등)
+	말 그대로 개발자가 오류를 찾기 위해 쓰기 때문에, 실제 배포할 때에는 필요가 없다!! (실제로 로깅이 남아서도 안되고)
+	(그래서 우리는 늘 콘솔에 뭔가를 찍어보고 확인이 끝나면 꼭 주석으로 처리하고 넘어갔었음)
+	
+	3단계. INFO
+	프로그램 구동 (운영) 시 사용자에게 알려줘야할 정보에 대한 기록을 하는 용도의 레벨
+	배포 시 필요한 레벨이다!!
+	
+	4단계. WARN
+	코드가 실행은 되지만 추후 문제가 생길 소지가 있을 경우의 기록을 남기는 용도의 레벨
+	
+	5단계. ERROR
+	어떠한 문제에 의해 실행이 안되는 경우에 대한 기록을 남기는 용도의 레벨
+	
+	~ 여기까지가 Logback 에서 지원하는 메세지 레벨 (Log4j 에서 6단계까지 지원) ~
+	
+	6단계. FATAL
+	시스템 상으로 크게 문제가 있을 경우에 대한 기록을 남기는 용도의 레벨 (제일 치명적)
+	
+	* Logback 의 설정파일
+	
+	- src/main/resource 에 logback-spring.xml 로 저장
+
+	1. 설정 태그들과 그 역할
+	- appender 태그 : 로깅을 어디에 할건지 설정해주는 태그 (콘솔, 파일 등)
+	- logger 태그 : 특정 패키지에 대한 로깅을 설정해주는 태그
+	- root 태그 : 전반적인 로깅 설정을 해주는 태그 (위에서 logger 로 설정되지 않은 것들에 대해 일괄 처리해줌)
+	
+	2. 메세지 레이아웃
+	- %-5level : 메세지 레벨 출력 (메세지 레벨을 5칸 왼쪽정렬로 찍겠다)
+	- %logger : 로깅이 발생한 위치 (풀클래스명)
+	- %msg : 실제 메세지 내용
+	- %n : 개행
+	- %d : 로깅이 발생한 시간 정보 (%d 만 쓰면 기본 형태로 나옴)
+		   날짜 형식은 커스터마이징이 가능하다!! (%d{여기에 형식 작성})
+		   SimpleDateFormat 와 형식이 똑같음!!
+	
+	3. 사용 가능한 appender 종류
+	- ConsoleAppender : 콘솔에 출력하는 도구
+	- FileAppender : 파일로 출력하는 도구
+	- RollingFileAppender : 날짜별 또는 용량별 파일을 분리해서 출력하는 도구
+-->
+
+<configuration>
+
+	<!-- appender 설정 : 어디에 로그를 남길건지 -->
+	<!-- 콘솔에 남기겠다. (ConsoleAppender) -->
+	<appender name="console" class="ch.qos.logback.core.ConsoleAppender">
+		<!-- 사실상 sysout 과 같은 역할 수행 -->
+		<encoder>
+			<pattern>%-5level: %logger - %msg %d{yyyy-MM-dd HH:mm:ss} %n</pattern>
+		</encoder>
+	</appender>
+
+	<!-- appender 설정을 여러개 둘 수 있다!! -->
+	<!-- 그냥 파일로 남기겠다. (FileAppender) -->
+	<appender name="fileout" class="ch.qos.logback.core.FileAppender">
+		<!-- name 은 설정명(내맘대로), class 는 Appender 도구의 풀클래스명으로 적는다. -->
+		
+		<file>log.out</file>
+		<!--
+			file 태그 안에는 파일명을 적는다.
+			(파일명만 적으면 상대경로에 의해 현재 내가 작업중인 이 프로젝트 폴더 안에 파일이 만들어짐,
+			 반대로 절대경로도 제시할 수 있다) 
+		-->
+
+		<append>true</append>
+		<!-- true 일 경우는 이어쓰기 false 일 경우는 덮어쓰기 -->
+
+		<encoder>
+			<pattern>%-5level: %logger - %msg %d{yyyy-MM-dd HH:mm:ss} %n</pattern>
+		</encoder>
+		<!-- 메세지 출력 형태를 지정한다. -->
+	</appender>
+
+	<!-- 날짜별로 파일에 저장하겠다. (RollingFileAppender) -->
+	<appender name="daily" class="ch.qos.logback.core.rolling.RollingFileAppender">
+	
+		<file>C:/mylog/daily.log</file>
+		<!-- 절대결로를 쓸 경우에는 반드시 존재하는 폴더여야한다!! -->
+	
+		<!-- 로그 파일 분리 정책을 설정 (날짜별 / 용량별) -->
+		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+			<fileNamePattern>C:/mylog/daily_%d{yyyyMMdd}.log</fileNamePattern>
+			<!-- 
+				우선 오늘 기준으로 daily.log 파일이 만들어지고, 그 안에 로그가 찍힘
+				날짜가 바뀌는 순간 daily_yyyyMMdd.log 파일로 파일명이 바뀜
+				다시 daily.log 파일이 만들어지고 그 안에 로그가 찍힘
+				...
+				(파일명에 들어가는 날짜 형식은 %d{형식} 을 적용한다)
+			-->
+			
+			<maxHistory>30</maxHistory>
+			<!-- 옵션 : 30일이 지난 로그파일은 자동 삭제해주겠다. (파일 보관 기간) -->
+			
+		</rollingPolicy>
+	
+		<encoder>
+			<pattern>%-5level: %logger - %msg %d{yyyy-MM-dd HH:mm:ss} %n</pattern>
+		</encoder>
+	
+	</appender>
+
+	<!-- logger 설정 : 패키지별로 로그를 다른게 남길 수 있음 -->
+	<logger name="com.kh.myweb" level="info" />
+	<!-- com.kh.myweb 패키지의 모든 하위 로그는 debug 수준부터 출력하겠다. -->
+
+	<!-- 
+		- 개발 시에는 내가 작업중인 패키지 하위의 모든 로그를 debug 수준 이상으로 출력하도록 셋팅
+		- 배포 시에는 info 수준 이상으로 출력하도록 바꾸고 난 뒤 빌드
+		  (logger.debug() 메소드마다 찾아다니면서 주석처리를 하지 않고 그냥 빌드해도 됨)
+	-->
+
+	<!--
+	<logger name="스프링시큐리티" level="info" />
+	<logger name="JPA" level="debug" />
+	-->
+	<!-- 각 모듈 패키지별로 서로 다른 레벨로 출력할 수 있도록 여러 개 설정 가능하다!! -->
+
+	<!-- root 설정 : 전반적인 설정 (logger 에서 언급되지 않은 것들에 대한 전반적인 설정) -->
+	<root level="info">
+		<appender-ref ref="console" />
+		<appender-ref ref="fileout" />
+		<!-- 
+			위에서 appender 를 여러개 설정해둔 만큼, 아래에서도 원하는 만큼 작성해도 됨!!
+			똑같은 로그 내용이 여러군데 찍히는 것!!
+		-->
+	</root>
+	<!-- 
+		위에서 logger 를 모두 생략했더니
+		어디서 나오는 로그 기록이든 간에 debug 수준이상부터 콘솔에 찍겠다.
+	-->
+	
+</configuration>
